@@ -1,9 +1,77 @@
+;;(setq Doom-theme 'Doom-one)
+(load-theme 'atom-one-dark t)
+(setq frame-title-format "emacs")
+;; 禁止菜单栏
+(menu-bar-mode -1)
+;; 禁止工具栏
+(tool-bar-mode -1)
+;; 进制滚动条
+(scroll-bar-mode -1)
+;; 禁止 emacs 一个劲的叫
+(setq visible-bell t)
+;; 在 console, 禁止屏幕不停地闪
+(setq ring-bell-function (lambda () t))
+;; 关闭启动时的开机画面
+(setq inhibit-startup-message t)
+;; 剪贴板最大条目 1000
+(setq kill-ring-max 1000)
+;; 一行最多显示 150
+(setq default-fill-column 150)
+;; 默认 major-mode 为 text-mode
+(setq default-major-mode 'text-mode)
+(column-number-mode)
+(desktop-save-mode 1)
+(show-paren-mode t)
+(setq show-paren-style 'parenthesses)
+;;显示语法高亮
 
+(global-font-lock-mode t)
+(global-hl-line-mode)
+(blink-cursor-mode 0)
+(winner-mode t)
+(windmove-default-keybindings)
+(set-frame-font "YaHei Fira Icon Hybrid 16" nil t)
+(setq shell-file-name (executable-find "/bin/zsh"))
+;;(set-default 'cursor-type 'hbar)
 (setq org-directory "~/org/")
 (setq user-full-name "Hanley Lee"
       user-mail-address "hanley.lei@gmail.com")
 (global-display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
+;;设置编码
+(set-buffer-file-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-16-le)
+(set-default-coding-systems 'utf-8)
+(set-clipboard-coding-system 'utf-8)
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)  
+(set-file-name-coding-system 'gb18030)
+;;内部有个自动补全功能，根据当前buffer的内容、文件名、剪切板等自动补全
+(setq hippie-expand-try-functions-list
+      '(
+        try-expand-dabbrev
+        try-expand-dabbrev-visible
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-file-name-partially
+        try-complete-file-name
+        try-expand-all-abbrevs
+        try-expand-list
+        try-expand-line
+        try-complete-lisp-symbol-partially
+        try-complete-lisp-symbol))
+;;按ALT+/ 键进行补全
+(global-set-key (kbd "M-/") 'hippie-expand)
+;;用ibuffer替换默认的buffer管理器
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+;;用正则搜索替换默认搜索
+(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+(global-set-key (kbd "C-r") 'isearch-backward-regexp)
+;;一个好用的minibuffer插件ido，许多插件都基于它。
+(ido-mode t)
+(setq ido-enable-flex-matching t)
 ;;(map! :leader
 ;;      :desc "Export Org to HTML"
 ;;      "a e" #'org-html-export-to-html)
@@ -13,22 +81,6 @@
 ;; (set-frame-width (selected-frame) 110)
 
 ;; (set-frame-height (selected-frame) 103)
-
-;;(setq Doom-theme 'Doom-one)
-(load-theme 'atom-one-dark t)
-(setq frame-title-format "emacs")
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(ido-mode)
-(column-number-mode)
-(desktop-save-mode 1)
-(show-paren-mode)
-(global-hl-line-mode)
-(winner-mode t)
-(windmove-default-keybindings)
-(set-frame-font "YaHei Fira Icon Hybrid 16" nil t)
-;;(set-default 'cursor-type 'hbar)
 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
