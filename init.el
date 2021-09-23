@@ -1,11 +1,19 @@
+;; (setq whitespace-display-mappings
+;;       '((newline-mark 10 [172 10])))
+
+;; (check-parens)
 ;;(setq Doom-theme 'Doom-one)
 (load-theme 'atom-one-dark t)
+;; Do not use the X clipboard for the unnamed register
+
 (setq frame-title-format "emacs")
 ;; 禁止菜单栏
-(menu-bar-mode -1)
+(menu-bar-mode 1)
 ;; 禁止工具栏
 (tool-bar-mode -1)
+(tooltip-mode -1)
 ;; 进制滚动条
+
 (scroll-bar-mode -1)
 ;; 禁止 emacs 一个劲的叫
 (setq visible-bell t)
@@ -20,7 +28,11 @@
 ;; 默认 major-mode 为 text-mode
 (setq default-major-mode 'text-mode)
 (column-number-mode)
+
 (desktop-save-mode 1)
+(setq desktop-path '("~/.cache/emacs/"))
+;;(desktop-read)
+
 (show-paren-mode t)
 (setq show-paren-style 'parenthesses)
 ;;显示语法高亮
@@ -30,28 +42,45 @@
 (blink-cursor-mode 0)
 (winner-mode t)
 (windmove-default-keybindings)
-(set-frame-font "YaHei Fira Icon Hybrid 16" nil t)
+;; set default font
+(set-face-attribute 'default nil :font (font-spec :family "Fira Code" :size 18))
+(set-fontset-font t 'unicode (font-spec :family "Microsoft YaHei" :size 18))
+(set-fontset-font t '(#x2ff0 . #x9ffc) (font-spec :family "Microsoft YaHei" :size 18))
+;; 最好不加 weight, 否则就直接限制了字体的动态性
+;; (set-fontset-font t '(#x2ff0 . #x9ffc) (font-spec :family "Microsoft YaHei" :size 18 :weight bold))
+;; (set-face-attribute 'default nil :font "YaHei Fira Icon Hybrid-13")
+
+;; (set-frame-font "YaHei Fira Icon Hybrid 16" nil t)
+
+;; (set-fontset-font "fontset-default"
+;;                   'greek-iso8859-7
+;;                   '("YaHei Fira Icon Hybrid 16" . "iso10646-1"))
+
+;; (set-fontset-font "fontset-default"
+;;                   'unicode-bmp
+;;                   '("YaHei Fira Icon Hybrid 22" . "iso10646-1"))
+
 (setq shell-file-name (executable-find "/bin/zsh"))
 ;;(set-default 'cursor-type 'hbar)
 (setq org-directory "~/org/")
 (setq user-full-name "Hanley Lee"
       user-mail-address "hanley.lei@gmail.com")
-(global-display-line-numbers-mode)
-(setq display-line-numbers-type 'relative)
+
 ;;设置编码
-(set-buffer-file-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)  
+(setq default-buffer-file-coding-system 'utf-8)
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-16-le)
 (set-default-coding-systems 'utf-8)
 (set-clipboard-coding-system 'utf-8)
+(set-file-name-coding-system 'utf-8)
 (set-language-environment "UTF-8")
-(prefer-coding-system 'utf-8)  
-(set-file-name-coding-system 'gb18030)
+
 ;;内部有个自动补全功能，根据当前buffer的内容、文件名、剪切板等自动补全
 (setq hippie-expand-try-functions-list
-      '(
-        try-expand-dabbrev
+      '(try-expand-dabbrev
         try-expand-dabbrev-visible
         try-expand-dabbrev-all-buffers
         try-expand-dabbrev-from-kill
@@ -72,9 +101,6 @@
 ;;一个好用的minibuffer插件ido，许多插件都基于它。
 (ido-mode t)
 (setq ido-enable-flex-matching t)
-;;(map! :leader
-;;      :desc "Export Org to HTML"
-;;      "a e" #'org-html-export-to-html)
 ;; ;;设置窗口位置为左上角(0,0)
 ;; (set-frame-position (selected-frame) 0 0)
 ;; ;;设置宽和高
@@ -86,25 +112,342 @@
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
 
-;; 使用 c-u 向上翻页
-(setq evil-want-C-u-scroll t)
-
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 ;; Set up package.el to work with MELPA
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
+;;(add-to-list 'package-archives
+;;             '("melpa" . "https://melpa.org/packages/"))
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
-;; (package-refresh-contents)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+;; :init keyword to execute code before a package is loaded
+;; :config can be used to execute code after a package is loaded
+;; commands, bind, bind*, bind-keymap, bind-keymap*, mode, interpreter, hook defer 可以延迟加载
+;; magic, magic-fallback to cause certain fucntion to be run if the begining of a file matches a given regular expression
+;; :disabled keyword can turn off a module you're having difficulties with, or stop loading something you're not using at the present time:
+;; :ensure keyword causes the package(s) to be installed automatically if not already present on your system
 (require 'use-package)
+(setq use-package-always-ensure t)
+
+(use-package paredit
+  :config
+  (paredit-mode))
+
+(column-number-mode)
+(global-display-line-numbers-mode t)
+(setq display-line-numbers-type 'relative)
+;; Disable line number for some modes
+(dolist (mode '(org-mode-hook
+    term-mode-hook
+    shell-mode-hook
+    eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 9))))
+
+
+(use-package command-log-mode)
+
+;; save commnad history
+(use-package smex
+  :defines smex-save-file
+  :config
+  (setq smex-history-length 15)
+  (smex-initialize))
+
+(global-set-key (kbd "C-M-b") 'counsel-switch-buffer)
+
+;; switch themes
+(define-key emacs-lisp-mode-map (kbd "C-x M-t") 'counsel-load-theme)
+
+(use-package all-the-icons)
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config
+  (setq all-the-icons-dired-monochrome nil)
+  )
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 1))
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-commnad)
+  ([remap describe-variabel] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+(use-package general
+  :config
+  (general-create-definer rune/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC"))
+
+(rune/leader-keys
+  "t" '(:ignore t :which-key "toggles")
+  "tt" '(counsel-load-theme :which-key "choose theme")
+  "C-h" '(counsel-buffer-or-recentf :which-key "recentf or buffer")
+  "C-f" '(counsel-projectile-find-file :which-key "project file")
+  "C-b" '(counsel-switch-buffer :which-key "buffer")
+  "fa" '(counsel-ag :which-key "ag")
+  )
+
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  )
+
+;; (use-package helm
+;;   :config (require 'helm-config))
+
+;; Magit
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+;; (use-package evil-magit
+;;   :after magit)
+    
+;;; Org mode
+(defun efs/org-font-setup ()
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 2.0)
+                  (org-level-2 . 1.5)
+                  (org-level-3 . 1.3)
+                  (org-level-4 . 1.2)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Microsoft YaHei" :weight 'regular :height (cdr face)))
+
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+(use-package org
+  :hook (org-mode . efs/org-mode-setup)
+  :config
+  (setq org-ellipsis " ...")
+  (efs/org-font-setup))
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(defun efs/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . efs/org-mode-visual-fill))
+
+;;; Markdown
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
+;(define-key global-map (kbd "C-c t") telega-prefix-map)
+;(with-eval-after-load 'telega
+;  (define-key telega-msg-button-map "k" nil))
+
+;; ivy
+(use-package ag)
+(use-package ack)
+;; MARK: ivy
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         ("C-u" . backward-kill-paragraph) 
+         ("C-w" . backward-kill-word) 
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill))
+         ;; :map ivy-reverse-i-search-line
+         ;; ("C-k" . ivy-previous-line)
+         ;; ("C-d" . ivy-reverse-i-serach-kill))
+  :config
+  (ivy-mode 1)
+  (setq enable-recursive-minibuffers t)
+  (setq ivy-wrap t)
+  (setq ivy-height 15)
+  (setq use-virtual-buffers t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-extra-directories nil)
+  ;; keep Ivy from quitting when press backspace in the minibuffer
+  (setq ivy-on-del-error-function #'ignore)
+  (setq ivy-initial-inputs-alist nil)
+  ;; ignore order
+  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order))))
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/repo/hkms/")
+    (setq projectile-project-search-path '("~/repo/hkms/")))
+  (setq projectile-switch-prject-action #'projectile-dired))
+  
+(use-package counsel
+  :config
+  (setq counsel-yank-pop-preselect-last t)
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x C-f" . counsel-find-file)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history)))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+(use-package ivy-posframe
+  ;; display at `ivy-posframe-style'
+  :config
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
+  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
+  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
+  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
+  ;; Different command can use different display function.
+  (setq ivy-posframe-parameters
+        '((left-fringe . 8)
+          (right-fringe . 8)))
+
+  (defun my-ivy-posframe-get-size ()
+    "Set the ivy-posframe size according to the current frame."
+    (let ((height (or ivy-posframe-height (or ivy-height 10)))
+          (width (min (or ivy-posframe-width 200) (round (* .75 (frame-width))))))
+      (list :height height :width width :min-height height :min-width width)))
+
+  (setq ivy-posframe-size-function 'my-ivy-posframe-get-size)
+    
+  ;; (setq ivy-posframe-min-width 90
+  ;;       ivy-posframe-width 110)
+  (setq ivy-posframe-height-alist '((swiper . 20)
+                                    (t      . 40)))
+
+  ;; (setq ivy-posframe-display-functions-alist
+  ;;       '((swiper          . ivy-display-function-fallback)
+  ;;         (complete-symbol . ivy-posframe-display-at-point)
+  ;;         (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+  ;;         (t               . ivy-posframe-display)))
+  (ivy-posframe-mode 1)
+  )
+
+(defun evil-hook ()
+  (dolist (mode '(custom-mode
+                  eshell-mode
+                  git-rebase-mode
+                  erc-mode
+                  circe-server-mode
+                  circe-chat-mode
+                  ag-mode
+                  flycheck-error-list-mode
+                  git-rebase-mode                          
+                  circe-query-mode
+                  sauron-mode
+                  term-mode))
+    (add-to-list 'evil-emacs-state-modes mode)))
+
+(use-package highlight)
+
+(setq evil-search-module 'evil-search)
 
 (use-package evil
-  :ensure t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-d-scroll t)
+  (setq evil-want-C-u-delete t)
+  (setq evil-want-C-i-jump nil)
+  (setq evil-want-C-w-delete t)
+  ;; :hook (evil-mode . evil-hook)
   :config
   (evil-mode 1)
+
+  (setq x-select-enable-clipboard nil)
+  (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
+  (define-key evil-insert-state-map  (kbd "s-v") (kbd "C-r +"))
+  (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
+  (define-key evil-normal-state-map  (kbd "s-v") (kbd "\"+p"))
+  (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "C-r +"))
+  
+
+  (evil-set-undo-system 'undo-redo)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+  (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
+  (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
+
+  (define-key evil-normal-state-map (kbd "-") 'dired-jump)
+  (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
+  (define-key evil-normal-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
+  (define-key evil-visual-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
+  (define-key evil-visual-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
+
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal)
 
   (use-package evil-leader
     :ensure t
@@ -117,25 +460,106 @@
     (global-evil-surround-mode))
 
   (use-package evil-indent-textobject
-    :ensure t))
+    :ensure t)
 
-(add-to-list 'evil-emacs-state-modes 'ag-mode)
-(add-to-list 'evil-emacs-state-modes 'flycheck-error-list-mode)
-(add-to-list 'evil-emacs-state-modes 'git-rebase-mode)
+  ;;  (use-package evil-search-highlight-persist
+  ;;    :config
+  ;;    (global-evil-search-highlight-persist t)
+  ;;    ;; To only display string whose length is greater than or equal to 3
+  ;;    ;; (setq evil-search-highlight-string-min-len 3)
+  ;;    )
+  (use-package evil-commentary
+    :config
+    (evil-commentary-mode)
+    )
+  (use-package evil-numbers)
+  )
 
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+;; (define-key evil-motion-state-map "," nil)
+;; (evil-define-key 'normal evil-commentary-mode-map
+;;   ",c" 'evil-commentary)
+;; (define-key evil-commentary-mode-map
+;;   (kbd "M-;") 'evil-commentary-line)
+
+(use-package company
+  :init
+  (setq company-require-match nil            ; Don't require match, so you can still move your cursor as expected.
+        company-tooltip-align-annotations t  ; Align annotation to the right side.
+        company-eclim-auto-save nil          ; Stop eclim auto save.
+        company-dabbrev-downcase nil        ; No downcase when completion.
+        company-idle-delay 1
+        tab-always-indent 'complete
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case nil
+        company-dabbrev-code-ignore-case t
+        company-minimum-prefix-length 3
+        company-backends
+        '((company-files
+           company-yasnippet
+           company-keywords
+           company-capf
+           company-xcode
+           )
+          (company-abbrev company-dabbrev)))
+  :ensure t
+  :config
+  (global-company-mode t)
+  ;; Enable downcase only when completing the completion.
+  (defun jcs--company-complete-selection--advice-around (fn)
+    "Advice execute around `company-complete-selection' command."
+    (let ((company-dabbrev-downcase t))
+      (call-interactively fn)))
+  (advice-add 'company-complete-selection :around #'jcs--company-complete-selection--advice-around))
+
+(use-package company-fuzzy
+  :config
+  (global-company-fuzzy-mode t)
+  (setq company-fuzzy-sorting-backend 'alphabetic)
+  (setq company-fuzzy-prefix-on-top t)
+  (setq company-fuzzy-passthrough-backends '(company-capf))
+  ;; Some backends doesn't allow me to get the list of candidates by passing the possible prefix; hence I have created this type of special scenario
+  (add-to-list 'company-fuzzy-history-backends 'company-yasnippet)
+  )
+
+(add-hook 'emacs-lisp-mode-hook (lambda ()
+                                  (add-to-list (make-local-variable 'company-backends)
+                                               'company-elisp)))
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "M-n") nil)
+  (define-key company-active-map (kbd "M-p") nil)
+  (define-key company-active-map (kbd "M-d") 'company-next-page)
+  (define-key company-active-map (kbd "M-u") 'company-previous-page)
+  (define-key company-active-map (kbd "C-u") nil)
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  )
+
+(use-package company
+  :config
+  ;; Enable downcase only when completing the completion.
+  (defun jcs--company-complete-selection--advice-around (fn)
+    "Advice execute around `company-complete-selection' command."
+    (let ((company-dabbrev-downcase t))
+      (call-interactively fn)))
+  (advice-add 'company-complete-selection :around #'jcs--company-complete-selection--advice-around))
 ;; same as below
 ;;(dolist (mode '(ag-mode
 ;;		flycheck-error-list-mode
 ;;		git-rebase-mode))
 ;;  (add-to-list 'evil-emacs-state-modes mode))
 
-(evil-add-hjkl-bindings recentf-dialog 'emacs
-  (kbd "/")       'evil-search-forward
-  (kbd "n")       'evil-search-next
-  (kbd "N")       'evil-search-previous
-  (kbd "C-d")     'evil-scroll-down
-  (kbd "C-u")     'evil-scroll-up
-  (kbd "C-w C-w") 'other-window)
+;; (evil-add-hjkl-bindings recentf-dialog 'emacs
+;;   (kbd "/")       'evil-search-forward
+;;   (kbd "n")       'evil-search-next
+;;   (kbd "N")       'evil-search-previous
+;;   (kbd "C-d")     'evil-scroll-down
+;;   (kbd "C-u")     'evil-scroll-up
+;;   (kbd "C-w C-w") 'other-window)
 
 ;; other
 ;; (add-hook 'occur-mode-hook
@@ -163,10 +587,6 @@
 ;;(unless (package-installed-p 'evil)
 ;;  (package-install 'evil))
 
-;; Enable Evil
-;;(require 'evil)
-;;(evil-mode 1)
-;; (map! :n (kbd "-") 'dired-jump)
 
 ;;(evil-find-char-pinyin-mode +1)
 
@@ -197,13 +617,8 @@
 ;; (evil-define-key 'visual evil-snipe-mode-map "x" #'evil-snipe-x)
 ;; (evil-define-key 'visual evil-snipe-mode-map "X" #'evil-snipe-X)
 
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1))
-;;(define-key global-map (kbd "C-c t") telega-prefix-map)
-;;(with-eval-after-load 'telega
-;;  (define-key telega-msg-button-map "k" nil))
-
+;; (use-package parinfer-rust-mode
+;;   :hook emacs-lisp-mode)
 
 (defun show-file-name ()
   "Show the full path file name in the minibuffer."
@@ -212,17 +627,3 @@
   (kill-new (file-truename buffer-file-name))
   )
 (global-set-key "\C-cg" 'show-file-name)
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(evil-visualstar doom-modeline evil-indent-textobject evil-leader evil-surround use-package atom-one-dark-theme evil company)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

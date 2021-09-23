@@ -48,3 +48,8 @@ flycheck_*.el
 /network-security.data
 
 recentf
+
+ido.last
+smex-items
+transient/
+var/
