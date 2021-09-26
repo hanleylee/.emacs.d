@@ -29,7 +29,7 @@
 (setq default-major-mode 'text-mode)
 (column-number-mode)
 
-(desktop-save-mode 1)
+;; (desktop-save-mode 1)
 (setq desktop-path '("~/.cache/emacs/"))
 ;;(desktop-read)
 
@@ -326,11 +326,49 @@
   (setq ivy-on-del-error-function #'ignore)
   (setq ivy-initial-inputs-alist nil)
   ;; ignore order
-  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order))))
+  (setq ivy-re-builders-alist '((t . ivy--regex-ignore-order))
+        ivy-more-chars-alist '((counsel-rg . 1)
+                               (counsel-ag . 0)
+                               (counsel-search . 2)
+                               (t . 3))
+        ))
 
 (use-package ivy-rich
   :init
   (ivy-rich-mode 1))
+
+;; (use-package mini-frame
+;;   :config
+;;   (mini-frame-mode)
+;;   (custom-set-variables
+;;  '(mini-frame-show-parameters
+;;    '((top . 10)
+;;      (width . 1.0)
+;;      (left . 0.5)
+;;      (height . 15)))))
+;; (use-package maple-minibuffer
+;;   :ensure nil
+;;   :hook (after-init . maple-minibuffer-mode)
+;;   :config
+;;   (setq maple-minibuffer:position-type 'window-center
+;;         maple-minibuffer:border-color "gray50"
+;;         maple-minibuffer:height nil
+;;         maple-minibuffer:width 0.7
+;;         maple-minibuffer:cache t)
+
+;;   (setq maple-minibuffer:action '(read-from-minibuffer read-string)
+;;         maple-minibuffer:ignore-action '(evil-ex eval-expression))
+
+;;   (add-to-list 'maple-minibuffer:ignore-action 'org-schedule)
+;;   (add-to-list 'maple-minibuffer:ignore-regexp "^helm-")
+
+;;   ;; more custom parameters for frame
+;;   (defun maple-minibuffer:parameters ()
+;;     "Maple minibuffer parameters."
+;;     `((height . ,(or maple-minibuffer:height 10))
+;;       (width . ,(or maple-minibuffer:width (window-pixel-width)))
+;;       (left-fringe . 5)
+;;       (right-fringe . 5))))
 
 (use-package projectile
   :diminish projectile-mode
@@ -627,3 +665,17 @@
   (kill-new (file-truename buffer-file-name))
   )
 (global-set-key "\C-cg" 'show-file-name)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(mini-frame-show-parameters '((top . 0) (width . 1.0) (left . 0.5) (height . 15)))
+ '(package-selected-packages
+   '(emacs-mini-frame which-key visual-fill-column use-package unicode-fonts smex simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-modeline counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
