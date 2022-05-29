@@ -3,8 +3,7 @@
 
 ;; (check-parens)
 ;;(setq Doom-theme 'Doom-one)
-(load-theme 'atom-one-dark t)
-;; Do not use the X clipboard for the unnamed register
+(load-theme 'doom-one t)
 
 (setq frame-title-format "emacs")
 ;; 禁止菜单栏
@@ -12,8 +11,8 @@
 ;; 禁止工具栏
 (tool-bar-mode -1)
 (tooltip-mode -1)
-;; 进制滚动条
 
+;; 禁止滚动条
 (scroll-bar-mode -1)
 ;; 禁止 emacs 一个劲的叫
 (setq visible-bell t)
@@ -42,23 +41,17 @@
 (blink-cursor-mode 0)
 (winner-mode t)
 (windmove-default-keybindings)
+
 ;; set default font
-(set-face-attribute 'default nil :font (font-spec :family "Fira Code" :size 18))
-(set-fontset-font t 'unicode (font-spec :family "Microsoft YaHei" :size 18))
-(set-fontset-font t '(#x2ff0 . #x9ffc) (font-spec :family "Microsoft YaHei" :size 18))
-;; 最好不加 weight, 否则就直接限制了字体的动态性
-;; (set-fontset-font t '(#x2ff0 . #x9ffc) (font-spec :family "Microsoft YaHei" :size 18 :weight bold))
-;; (set-face-attribute 'default nil :font "YaHei Fira Icon Hybrid-13")
-
-;; (set-frame-font "YaHei Fira Icon Hybrid 16" nil t)
-
-;; (set-fontset-font "fontset-default"
-;;                   'greek-iso8859-7
-;;                   '("YaHei Fira Icon Hybrid 16" . "iso10646-1"))
-
-;; (set-fontset-font "fontset-default"
-;;                   'unicode-bmp
-;;                   '("YaHei Fira Icon Hybrid 22" . "iso10646-1"))
+(set-face-attribute 
+ 'default nil :font (font-spec :family "FiraCode Nerd Font Mono" :size 16))
+(dolist (charset '(kana han cjk-misc bopomofo))
+  (set-fontset-font (frame-parameter nil 'font)
+                    charset
+                    (font-spec :family "LXGW WenKai Mono")))
+(setq face-font-rescale-alist '(("LXGW WenKai Mono" . 1.0)))
+                                        ; (set-fontset-font t 'unicode (font-spec :family "Microsoft YaHei" :size 16))
+                                        ; (set-fontset-font t '(#x4E00 . #x9ffc) (font-spec :family "Microsoft YaHei" :size 18))
 
 (setq shell-file-name (executable-find "/bin/zsh"))
 ;;(set-default 'cursor-type 'hbar)
@@ -93,11 +86,6 @@
         try-complete-lisp-symbol))
 ;;按ALT+/ 键进行补全
 (global-set-key (kbd "M-/") 'hippie-expand)
-;;用ibuffer替换默认的buffer管理器
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-;;用正则搜索替换默认搜索
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
-(global-set-key (kbd "C-r") 'isearch-backward-regexp)
 ;;一个好用的minibuffer插件ido，许多插件都基于它。
 (ido-mode t)
 (setq ido-enable-flex-matching t)
@@ -150,13 +138,32 @@
 (setq display-line-numbers-type 'relative)
 ;; Disable line number for some modes
 (dolist (mode '(org-mode-hook
-    term-mode-hook
-    shell-mode-hook
-    eshell-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 9))))
+                term-mode-hook
+                shell-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 9))))
 
 
 (use-package command-log-mode)
+
+;; MARK: doom-theme
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-one t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 
 ;; save commnad history
 (use-package smex
@@ -164,8 +171,6 @@
   :config
   (setq smex-history-length 15)
   (smex-initialize))
-
-(global-set-key (kbd "C-M-b") 'counsel-switch-buffer)
 
 ;; switch themes
 (define-key emacs-lisp-mode-map (kbd "C-x M-t") 'counsel-load-theme)
@@ -234,9 +239,9 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-;; (use-package evil-magit
-;;   :after magit)
-    
+                                        ; (use-package evil-magit
+                                        ;              :after magit)
+
 ;;; Org mode
 (defun efs/org-font-setup ()
   ;; Replace list hyphen with dot
@@ -253,7 +258,7 @@
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Microsoft YaHei" :weight 'regular :height (cdr face)))
+    (set-face-attribute (car face) nil :font "LXGW WenKai Mono" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -289,9 +294,9 @@
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown"))
-;(define-key global-map (kbd "C-c t") telega-prefix-map)
-;(with-eval-after-load 'telega
-;  (define-key telega-msg-button-map "k" nil))
+                                        ;(define-key global-map (kbd "C-c t") telega-prefix-map)
+                                        ;(with-eval-after-load 'telega
+                                        ;  (define-key telega-msg-button-map "k" nil))
 
 ;; ivy
 (use-package ag)
@@ -311,14 +316,14 @@
          ("C-k" . ivy-previous-line)
          ("C-l" . ivy-done)
          ("C-d" . ivy-switch-buffer-kill))
-         ;; :map ivy-reverse-i-search-line
-         ;; ("C-k" . ivy-previous-line)
-         ;; ("C-d" . ivy-reverse-i-serach-kill))
+  ;; :map ivy-reverse-i-search-line
+  ;; ("C-k" . ivy-previous-line)
+  ;; ("C-d" . ivy-reverse-i-serach-kill))
   :config
   (ivy-mode 1)
   (setq enable-recursive-minibuffers t)
   (setq ivy-wrap t)
-  (setq ivy-height 15)
+  (setq ivy-height 50)
   (setq use-virtual-buffers t)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-extra-directories nil)
@@ -331,11 +336,46 @@
                                (counsel-ag . 0)
                                (counsel-search . 2)
                                (t . 3))
-        ))
+        )
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1))
+  (use-package ivy-posframe
+    ;; display at `ivy-posframe-style'
+    :config
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
+    ;; Different command can use different display function.
+    (setq ivy-posframe-parameters
+          '((left-fringe . 8)
+            (right-fringe . 8)))
 
-(use-package ivy-rich
-  :init
-  (ivy-rich-mode 1))
+    (defun my-ivy-posframe-get-size ()
+      "Set the ivy-posframe size according to the current frame."
+      (let ((height (or ivy-posframe-height (or ivy-height 10)))
+            (width (min (or ivy-posframe-width 200) (round (* .75 (frame-width))))))
+        (list :height height :width width :min-height height :min-width width)))
+
+    (setq ivy-posframe-size-function 'my-ivy-posframe-get-size)
+    
+    ;; (setq ivy-posframe-min-width 90
+    ;;       ivy-posframe-width 110)
+    (setq ivy-posframe-height-alist '((swiper . 50)
+                                      (t      . 40)))
+
+    ;; (setq ivy-posframe-display-functions-alist
+    ;;       '((swiper          . ivy-display-function-fallback)
+    ;;         (complete-symbol . ivy-posframe-display-at-point)
+    ;;         (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+    ;;         (t               . ivy-posframe-display)))
+    (ivy-posframe-mode 1))
+
+  )
+
 
 ;; (use-package mini-frame
 ;;   :config
@@ -380,53 +420,19 @@
   (when (file-directory-p "~/repo/hkms/")
     (setq projectile-project-search-path '("~/repo/hkms/")))
   (setq projectile-switch-prject-action #'projectile-dired))
-  
+
 (use-package counsel
   :config
   (setq counsel-yank-pop-preselect-last t)
   :bind (("M-x" . counsel-M-x)
-         ("C-x b" . counsel-ibuffer)
+         ("C-x C-b" . counsel-ibuffer)
          ("C-x C-f" . counsel-find-file)
+         ("C-x C-h" . counsel-buffer-or-recentf)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history)))
 
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
-
-(use-package ivy-posframe
-  ;; display at `ivy-posframe-style'
-  :config
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
-  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
-  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
-  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
-  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
-  ;; Different command can use different display function.
-  (setq ivy-posframe-parameters
-        '((left-fringe . 8)
-          (right-fringe . 8)))
-
-  (defun my-ivy-posframe-get-size ()
-    "Set the ivy-posframe size according to the current frame."
-    (let ((height (or ivy-posframe-height (or ivy-height 10)))
-          (width (min (or ivy-posframe-width 200) (round (* .75 (frame-width))))))
-      (list :height height :width width :min-height height :min-width width)))
-
-  (setq ivy-posframe-size-function 'my-ivy-posframe-get-size)
-    
-  ;; (setq ivy-posframe-min-width 90
-  ;;       ivy-posframe-width 110)
-  (setq ivy-posframe-height-alist '((swiper . 20)
-                                    (t      . 40)))
-
-  ;; (setq ivy-posframe-display-functions-alist
-  ;;       '((swiper          . ivy-display-function-fallback)
-  ;;         (complete-symbol . ivy-posframe-display-at-point)
-  ;;         (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
-  ;;         (t               . ivy-posframe-display)))
-  (ivy-posframe-mode 1)
-  )
 
 (defun evil-hook ()
   (dolist (mode '(custom-mode
@@ -461,10 +467,10 @@
   (evil-mode 1)
 
   (setq x-select-enable-clipboard nil)
-  (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
-  (define-key evil-insert-state-map  (kbd "s-v") (kbd "C-r +"))
-  (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
   (define-key evil-normal-state-map  (kbd "s-v") (kbd "\"+p"))
+  (define-key evil-insert-state-map  (kbd "s-v") (kbd "C-r +"))
+  (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
+  (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
   (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "C-r +"))
   
 
@@ -477,8 +483,6 @@
   (define-key evil-normal-state-map (kbd "-") 'dired-jump)
   (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
-  (define-key evil-visual-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
-  (define-key evil-visual-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -511,12 +515,34 @@
     (evil-commentary-mode)
     )
   (use-package evil-numbers)
-  )
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
 
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
+  (use-package sis
+    ;; :hook
+    ;; enable the /follow context/ and /inline region/ mode for specific buffers
+    ;; (((text-mode prog-mode) . sis-context-mode)
+    ;;  ((text-mode prog-mode) . sis-inline-mode))
+
+    :config
+    ;; For MacOS
+    (sis-ism-lazyman-config
+
+     "com.apple.keylayout.ABC"
+     "im.rime.inputmethod.Squirrel.Rime")
+
+    ;; enable the /cursor color/ mode
+    (sis-global-cursor-color-mode t)
+    ;; enable the /respect/ mode
+    (sis-global-respect-mode t)
+    ;; enable the /context/ mode for all buffers
+    (sis-global-context-mode t)
+    ;; enable the /inline english/ mode for all buffers
+    (sis-global-inline-mode t))
+
+  )
 
 ;; (define-key evil-motion-state-map "," nil)
 ;; (evil-define-key 'normal evil-commentary-mode-map
@@ -530,12 +556,12 @@
         company-tooltip-align-annotations t  ; Align annotation to the right side.
         company-eclim-auto-save nil          ; Stop eclim auto save.
         company-dabbrev-downcase nil        ; No downcase when completion.
-        company-idle-delay 1
+        company-idle-delay 0.5              ; 开始自动补全前的延迟秒数。输入前缀长度必须要满足 company-minimum-prefix-length，该值为 nil 表示没有延迟。
         tab-always-indent 'complete
         company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil
         company-dabbrev-code-ignore-case t
-        company-minimum-prefix-length 3
+        company-minimum-prefix-length 2 ; 补全的最小前缀长度
         company-backends
         '((company-files
            company-yasnippet
@@ -552,16 +578,16 @@
     "Advice execute around `company-complete-selection' command."
     (let ((company-dabbrev-downcase t))
       (call-interactively fn)))
-  (advice-add 'company-complete-selection :around #'jcs--company-complete-selection--advice-around))
-
-(use-package company-fuzzy
-  :config
-  (global-company-fuzzy-mode t)
-  (setq company-fuzzy-sorting-backend 'alphabetic)
-  (setq company-fuzzy-prefix-on-top t)
-  (setq company-fuzzy-passthrough-backends '(company-capf))
-  ;; Some backends doesn't allow me to get the list of candidates by passing the possible prefix; hence I have created this type of special scenario
-  (add-to-list 'company-fuzzy-history-backends 'company-yasnippet)
+  (advice-add 'company-complete-selection :around #'jcs--company-complete-selection--advice-around)
+  (use-package company-fuzzy
+    :config
+    (global-company-fuzzy-mode t)
+    (setq company-fuzzy-sorting-backend 'alphabetic)
+    (setq company-fuzzy-prefix-on-top t)
+    (setq company-fuzzy-passthrough-backends '(company-capf))
+    ;; Some backends doesn't allow me to get the list of candidates by passing the possible prefix; hence I have created this type of special scenario
+    (add-to-list 'company-fuzzy-history-backends 'company-yasnippet)
+    )
   )
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
@@ -574,17 +600,8 @@
   (define-key company-active-map (kbd "M-u") 'company-previous-page)
   (define-key company-active-map (kbd "C-u") nil)
   (define-key company-active-map (kbd "C-n") 'company-select-next)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  )
+  (define-key company-active-map (kbd "C-p") 'company-select-previous))
 
-(use-package company
-  :config
-  ;; Enable downcase only when completing the completion.
-  (defun jcs--company-complete-selection--advice-around (fn)
-    "Advice execute around `company-complete-selection' command."
-    (let ((company-dabbrev-downcase t))
-      (call-interactively fn)))
-  (advice-add 'company-complete-selection :around #'jcs--company-complete-selection--advice-around))
 ;; same as below
 ;;(dolist (mode '(ag-mode
 ;;		flycheck-error-list-mode
