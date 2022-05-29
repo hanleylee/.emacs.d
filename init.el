@@ -11,6 +11,8 @@
 ;; 禁止工具栏
 (tool-bar-mode -1)
 (tooltip-mode -1)
+;; 记录上一次文件打开的位置, 并在再次打开该文件的时候自动跳转到该位置
+(save-place-mode 1)
 
 ;; 禁止滚动条
 (scroll-bar-mode -1)
@@ -175,23 +177,20 @@
 ;; switch themes
 (define-key emacs-lisp-mode-map (kbd "C-x M-t") 'counsel-load-theme)
 
-(use-package all-the-icons)
+(use-package all-the-icons
+  :ensure t)
 (use-package all-the-icons-dired
   :hook (dired-mode . all-the-icons-dired-mode)
   :config
-  (setq all-the-icons-dired-monochrome nil)
-  )
+  (setq all-the-icons-dired-monochrome nil))
 
 (use-package doom-modeline
+  :ensure t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
-
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1))
 
 (use-package which-key
   :init (which-key-mode)
@@ -239,9 +238,6 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-                                        ; (use-package evil-magit
-                                        ;              :after magit)
-
 ;;; Org mode
 (defun efs/org-font-setup ()
   ;; Replace list hyphen with dot
@@ -267,13 +263,23 @@
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  )
 
 (use-package org
-  :hook (org-mode . efs/org-mode-setup)
+  ;; :hook (org-mode . efs/org-mode-setup)
   :config
   (setq org-ellipsis " ...")
-  (efs/org-font-setup))
+  (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
+  (setq truncate-lines nil)
+  (setq org-src-fontify-natively t)
+  (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "|" "DONE(d)" "ABORT(a)")))
+  (setq org-todo-keywords-faces '(("TODO" . "red")
+                                  ("DOING" . "yellow")
+                                  ("DONE" . "green")))
+  (setq org-use-fast-todo-selection t)
+  (efs/org-font-setup)
+  )
 
 (use-package org-bullets
   :after org
