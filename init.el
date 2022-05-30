@@ -266,7 +266,7 @@
   :init (which-key-mode)
   :diminish which-key-mode
   :config
-  (setq which-key-idle-delay 1))
+  (setq which-key-idle-delay 0.5))
 
 (use-package helpful
   :custom
@@ -283,14 +283,15 @@
   (general-create-definer rune/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
-    :global-prefix "C-SPC"))
+    :global-prefix "S-SPC"))
 
 (rune/leader-keys
-  "t" '(:ignore t :which-key "toggles")
-  "tt" '(counsel-load-theme :which-key "choose theme")
-  "C-h" '(counsel-buffer-or-recentf :which-key "recentf or buffer")
-  "C-f" '(counsel-projectile-find-file :which-key "project file")
-  "C-b" '(counsel-switch-buffer :which-key "buffer")
+  "t" '(:ignore t :which-key "Toggles")
+  "tt" '(counsel-load-theme :which-key "Choose theme")
+  "C-h" '(counsel-buffer-or-recentf :which-key "Recentf or buffer")
+  "C-f" '(counsel-projectile-find-file :which-key "Project file")
+  "C-b" '(counsel-switch-buffer :which-key "Buffer")
+  "gs" '(magit-status :which-key "Magit Status")
   "fa" '(counsel-ag :which-key "ag")
   )
 
@@ -311,59 +312,55 @@
 ;;; Org mode
 (defun efs/org-font-setup ()
   ;; Replace list hyphen with dot
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+  ;; (font-lock-add-keywords 'org-mode
+  ;;                         '(("^ *\\([-]\\) "
+  ;;                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-  ;; Set faces for heading levels
-  (dolist (face '((org-level-1 . 2.0)
-                  (org-level-2 . 1.5)
-                  (org-level-3 . 1.3)
-                  (org-level-4 . 1.2)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "LXGW WenKai Mono" :weight 'regular :height (cdr face)))
+  ;; ;; Set faces for heading levels
+  ;; (dolist (face '((org-level-1 . 2.0)
+  ;;                 (org-level-2 . 1.5)
+  ;;                 (org-level-3 . 1.3)
+  ;;                 (org-level-4 . 1.2)
+  ;;                 (org-level-5 . 1.1)
+  ;;                 (org-level-6 . 1.1)
+  ;;                 (org-level-7 . 1.1)
+  ;;                 (org-level-8 . 1.1)))
+  ;;   (set-face-attribute (car face) nil :font "LXGW WenKai Mono" :weight 'regular :height (cdr face)))
 
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  ;; ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  ;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  (custom-set-faces
+   '(org-level-1 ((t (:inherit outline-1 :height 1.5))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.4))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.3))))
+   '(org-level-4 ((t (:inherit outline-4 :height 1.2))))
+   '(org-level-5 ((t (:inherit outline-5 :height 1.1))))
+   )
   )
 
 (use-package org
   ;; :hook (org-mode . efs/org-mode-setup)
   :config
-  (setq org-ellipsis " ...")
+  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
   (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
+  (setq org-ellipsis " ...")
   (setq truncate-lines nil)
   (setq org-hide-emphasis-markers t)
   (setq org-src-fontify-natively t)
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "|" "DONE(d)" "ABORT(a)")))
-  (setq org-todo-keywords-faces '(("TODO" . "red")
-                                  ("DOING" . "yellow")
-                                  ("DONE" . "green")))
   (setq org-use-fast-todo-selection t)
-  ;; (efs/org-font-setup)
-  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+  (efs/org-font-setup)
   (use-package org-bullets
     :after org
     :hook (org-mode . org-bullets-mode)
     :custom
     (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-  ;; (defun efs/org-mode-visual-fill ()
-  ;;   (setq visual-fill-column-width 100
-  ;;         visual-fill-column-center-text t)
-  ;;   (visual-fill-column-mode 1))
-
-  ;; (use-package visual-fill-column
-  ;;   :hook (org-mode . efs/org-mode-visual-fill))
 
   (use-package org-appear
     :init
@@ -617,6 +614,7 @@
   (use-package evil-numbers)
   (use-package evil-collection
     :after evil
+    :ensure t
     :config
     (evil-collection-init))
 
