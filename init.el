@@ -106,6 +106,11 @@
 
 ;; (set-frame-height (selected-frame) 103)
 
+(setq org-capture-templates
+      `(("t" "task" entry (file "~/repo/hkms//inbox.org")
+         "* TODO %?\nCaptured %<%Y-%m-%d %H:%M>") 
+        ("n" "note" entry (file "~/repo/hkms/notes.org")
+         "* Note %<%Y-%m-%d %H:%M>\n%?")))
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
@@ -167,12 +172,13 @@
   (setq dashboard-center-content t)
 
   ;; To disable shortcut "jump" indicators for each section, set
-  (setq dashboard-show-shortcuts nil)
-  (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (agenda . 5)
+  (setq dashboard-show-shortcuts t)
+  (setq dashboard-items '((recents  . 10)
+                          (bookmarks . 10)
+                          (projects . 10)
+                          (agenda . 10)
                           (registers . 5)))
+  ;; (add-to-list 'dashboard-items '(agenda) t)
   (setq dashboard-item-names '(("Recent Files:" . "Recently opened files:")
                                ("Agenda for today:" . "Today's agenda:")
                                ("Agenda for the coming week:" . "Agenda:")))
@@ -198,7 +204,7 @@
            ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
   (setq dashboard-set-init-info t)
   (setq dashboard-init-info "This is an init message!")
-  (setq dashboard-set-footer nil)
+  (setq dashboard-set-footer t)
   (setq dashboard-footer-messages '("Dashboard is pretty cool!"))
   (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
                                                      :height 1.1
@@ -206,7 +212,6 @@
                                                      :face 'font-lock-keyword-face))
   (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
   (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
-  (add-to-list 'dashboard-items '(agenda) t)
   (setq dashboard-week-agenda t)
   (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   )
@@ -291,8 +296,11 @@
   "C-h" '(counsel-buffer-or-recentf :which-key "Recentf or buffer")
   "C-f" '(counsel-projectile-find-file :which-key "Project file")
   "C-b" '(counsel-switch-buffer :which-key "Buffer")
+  "C-g" '(show-file-name :which-key "Show file name")
   "gs" '(magit-status :which-key "Magit Status")
   "fa" '(counsel-ag :which-key "ag")
+  "ct" '(org-capture :which-key "Org Capture")
+  "ad" '(org-agenda :which-key "Org Agenda")
   )
 
 (use-package exec-path-from-shell
@@ -312,9 +320,12 @@
 ;;; Org mode
 (defun efs/org-font-setup ()
   ;; Replace list hyphen with dot
-  ;; (font-lock-add-keywords 'org-mode
-  ;;                         '(("^ *\\([-]\\) "
-  ;;                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([+]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
 
   ;; ;; Set faces for heading levels
   ;; (dolist (face '((org-level-1 . 2.0)
@@ -336,10 +347,10 @@
   ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
   (custom-set-faces
-   '(org-level-1 ((t (:inherit outline-1 :height 1.5))))
-   '(org-level-2 ((t (:inherit outline-2 :height 1.4))))
-   '(org-level-3 ((t (:inherit outline-3 :height 1.3))))
-   '(org-level-4 ((t (:inherit outline-4 :height 1.2))))
+   '(org-level-1 ((t (:inherit outline-1 :height 1.3))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.25))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
+   '(org-level-4 ((t (:inherit outline-4 :height 1.15))))
    '(org-level-5 ((t (:inherit outline-5 :height 1.1))))
    )
   )
@@ -347,20 +358,87 @@
 (use-package org
   ;; :hook (org-mode . efs/org-mode-setup)
   :config
-  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
   (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
-  (setq org-ellipsis " ...")
+  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+  (setq org-ellipsis " ···")
   (setq truncate-lines nil)
   (setq org-hide-emphasis-markers t)
+  (setq org-hide-leading-stars t)
+  (setq org-fontify-done-headline t)
+  (setq org-pretty-entities t)
+  (setq org-odd-level-only t)
   (setq org-src-fontify-natively t)
-  (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "|" "DONE(d)" "ABORT(a)")))
+  (setq org-src-tab-acts-natively t)
+  (setq org-todo-keywords '((type "工作(w!)" "学习(s!)" "休闲(l!)" "|")
+                            (sequence "TODO(t!)" "DOING(i!)" "|" "DONE(d!)" "ABORT(a!)")
+                            ))
+  (setq org-todo-keyword-faces
+  '(("工作" .       (:foreground "blue" :weight bold))
+    ("学习" .       (:foreground "orange" :weight bold))
+    ("休闲" .       (:foreground "cyan" :weight bold)) 
+    ("TODO" .      (:foreground "yellow" :weight bold))
+    ("DOING" .     (:foreground "green" :weight bold))
+    ("DONE" .      (:foreground "gray" :weight bold)) 
+    ("ABORT" .     (:foreground "gray"))
+    ))
+  ;; 优先级范围和默认任务的优先级
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority  ?E)
+  (setq org-default-priority ?E)
+  ;; 优先级醒目外观
+  (setq org-priority-faces
+        '((?A . (:foreground "red" :weight bold))
+          (?B . (:foreground "orange" :weight bold))
+          (?C . (:foreground "yellow" :weight bold))
+          (?D . (:foreground "purple" :weight bold))
+          (?E . (:foreground "green" :weight bold))
+          ))
+  (setq org-tag-alist '(("@work" . ?w) ("@home" . ?h) ("laptop" . ?l)))
+  (setq org-enforce-todo-dependencies t) ;; 如果子任务没有全部完成, 主任务将不能设置为 DONE 状态
+  (setq mark-holidays-in-calendar t)
+  (setq my-holidays
+        '(;;公历节日
+          (holiday-fixed 2 14 "情人节")
+          (holiday-fixed 9 10 "教师节")
+          (holiday-float 6 0 3 "父亲节")
+          ;; 农历节日
+          (holiday-lunar 1 1 "春节" 0)
+          (holiday-lunar 1 15 "元宵节" 0)
+          (holiday-solar-term "清明" "清明节")
+          (holiday-lunar 5 5 "端午节" 0)
+          (holiday-lunar 7 7 "七夕情人节" 0)
+          (holiday-lunar 8 15 "中秋节" 0)
+          ;;纪念日
+          (holiday-fixed 1 1 "儿子生日")
+          (holiday-lunar 2 2 "老婆生日"  0)
+          (holiday-lunar 3 3 "我的生日" 0)
+          ))
+  (setq calendar-holidays my-holidays)  ;只显示我定制的节假日
   (setq org-use-fast-todo-selection t)
+  (setq org-startup-indented t)
+  (setq org-agenda-files (list "/Users/hanley/repo/hkms/"))
+  (setq org-agenda-ndays 21)
+  (setq org-agenda-include-diary t)
   (efs/org-font-setup)
+  (setq org-list-demote-modify-bullet
+      (quote (("+" . "-")
+              ("-" . "+")
+              ("*" . "-")
+              ("1." . "-")
+              ("1)" . "-")
+              ("A)" . "-")
+              ("B)" . "-")
+              ("a)" . "-")
+              ("b)" . "-")
+              ("A." . "-")
+              ("B." . "-")
+              ("a." . "-")
+              ("b." . "-"))))
   (use-package org-bullets
     :after org
     :hook (org-mode . org-bullets-mode)
     :custom
-    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+    (org-bullets-bullet-list '("●" "◉" "○" "▶" "◇" "◆" "★" "✿" "❀" "✸")))
 
   (use-package org-appear
     :init
@@ -570,7 +648,7 @@
   (define-key evil-normal-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
 
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map  (kbd "s-v") (kbd "C-r +"))
+  (define-key evil-insert-state-map (kbd "s-v") (kbd "C-r +"))
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
@@ -616,6 +694,14 @@
     :ensure t
     :config
     (evil-collection-init))
+
+  (use-package evil-org
+    :ensure t
+    :after org
+    :hook (org-mode . (lambda () evil-org-mode))
+    :config
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 
   (use-package sis
     ;; :hook
@@ -778,7 +864,6 @@
   (message (buffer-file-name))
   (kill-new (file-truename buffer-file-name))
   )
-(global-set-key "\C-cg" 'show-file-name)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -786,10 +871,4 @@
  ;; If there is more than one, they won't work right.
  '(mini-frame-show-parameters '((top . 0) (width . 1.0) (left . 0.5) (height . 15)))
  '(package-selected-packages
-   '(org-appear emacs-mini-frame which-key visual-fill-column use-package unicode-fonts smex simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-modeline counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+   '(evil-org org-appear emacs-mini-frame which-key visual-fill-column use-package unicode-fonts smex simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-modeline counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
