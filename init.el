@@ -44,6 +44,14 @@
 (winner-mode t)
 (windmove-default-keybindings)
 
+(setq
+ backup-by-copying t      ; don't clobber symlinks
+ backup-directory-alist '(("." . "~/.cache/emacs/backup"))    ; don't litter my fs tree
+ delete-old-versions t
+ kept-new-versions 6
+ kept-old-versions 2
+ version-control t)       ; use versioned backups
+
 ;; set default font
 (set-face-attribute 
  'default nil :font (font-spec :family "FiraCode Nerd Font Mono" :size 16))
@@ -62,7 +70,7 @@
       user-mail-address "hanley.lei@gmail.com")
 
 ;;设置编码
-(prefer-coding-system 'utf-8)  
+(prefer-coding-system 'utf-8)
 (setq default-buffer-file-coding-system 'utf-8)
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 (set-terminal-coding-system 'utf-8)
@@ -108,6 +116,16 @@
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+(column-number-mode)
+(global-display-line-numbers-mode t)
+(setq display-line-numbers-type 'relative)
+;; Disable line number for some modes
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 9))))
 ;; Set up package.el to work with MELPA
 (require 'package)
 ;;(add-to-list 'package-archives
@@ -131,19 +149,71 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  ;; Set the title
+  (setq dashboard-banner-logo-title "Welcome to Emacs Dashboard")
+  ;; Set the banner
+  (setq dashboard-startup-banner [VALUE])
+  ;; Value can be
+  ;; 'official which displays the official emacs logo
+  ;; 'logo which displays an alternative emacs logo
+  ;; 1, 2 or 3 which displays one of the text banners
+  ;; "path/to/your/image.gif", "path/to/your/image.png" or "path/to/your/text.txt" which displays whatever gif/image/text you would prefer
+
+  ;; Content is not centered by default. To center, set
+  (setq dashboard-center-content t)
+
+  ;; To disable shortcut "jump" indicators for each section, set
+  (setq dashboard-show-shortcuts nil)
+  (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (projects . 5)
+                          (agenda . 5)
+                          (registers . 5)))
+  (setq dashboard-item-names '(("Recent Files:" . "Recently opened files:")
+                               ("Agenda for today:" . "Today's agenda:")
+                               ("Agenda for the coming week:" . "Agenda:")))
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (dashboard-modify-heading-icons '((recents . "file-text")
+                                    (bookmarks . "book")))
+  (setq dashboard-set-navigator t)
+  ;; Format: "(icon title help action face prefix suffix)"
+  (setq dashboard-navigator-buttons
+        `(;; line1
+          ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+            "Homepage"
+            "Browse homepage"
+            (lambda (&rest _) (browse-url "homepage")))
+           ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+           ("?" "" "?/h" #'show-help nil "<" ">"))
+          ;; line 2
+          ((,(all-the-icons-faicon "linkedin" :height 1.1 :v-adjust 0.0)
+            "Linkedin"
+            ""
+            (lambda (&rest _) (browse-url "homepage")))
+           ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
+  (setq dashboard-set-init-info t)
+  (setq dashboard-init-info "This is an init message!")
+  (setq dashboard-set-footer nil)
+  (setq dashboard-footer-messages '("Dashboard is pretty cool!"))
+  (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+                                                     :height 1.1
+                                                     :v-adjust -0.05
+                                                     :face 'font-lock-keyword-face))
+  (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+  (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
+  (add-to-list 'dashboard-items '(agenda) t)
+  (setq dashboard-week-agenda t)
+  (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+  )
+
 (use-package paredit
   :config
   (paredit-mode))
-
-(column-number-mode)
-(global-display-line-numbers-mode t)
-(setq display-line-numbers-type 'relative)
-;; Disable line number for some modes
-(dolist (mode '(org-mode-hook
-                term-mode-hook
-                shell-mode-hook
-                eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 9))))
 
 
 (use-package command-log-mode)
@@ -272,28 +342,52 @@
   (setq org-ellipsis " ...")
   (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
   (setq truncate-lines nil)
+  (setq org-hide-emphasis-markers t)
   (setq org-src-fontify-natively t)
   (setq org-todo-keywords '((sequence "TODO(t)" "DOING(i)" "|" "DONE(d)" "ABORT(a)")))
   (setq org-todo-keywords-faces '(("TODO" . "red")
                                   ("DOING" . "yellow")
                                   ("DONE" . "green")))
   (setq org-use-fast-todo-selection t)
-  (efs/org-font-setup)
+  ;; (efs/org-font-setup)
+  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+  (use-package org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+  ;; (defun efs/org-mode-visual-fill ()
+  ;;   (setq visual-fill-column-width 100
+  ;;         visual-fill-column-center-text t)
+  ;;   (visual-fill-column-mode 1))
+
+  ;; (use-package visual-fill-column
+  ;;   :hook (org-mode . efs/org-mode-visual-fill))
+
+  (use-package org-appear
+    :init
+    (setq org-appear-autolinks t
+          org-appear-autosubmarkers t
+          org-appear-autoentities t
+          org-appear-autokeywords t
+          org-appear-inside-latex t
+          org-appear-delay 0
+          org-appear-trigger 'always)
+    :config
+    (add-hook 'org-mode-hook 'org-appear-mode)
+    ;; (setq org-appear-trigger 'manual)
+    ;; (add-hook 'org-mode-hook (lambda ()
+    ;;                            (add-hook 'evil-insert-state-entry-hook
+    ;;                                      #'org-appear-manual-start
+    ;;                                      nil
+    ;;                                      t)
+    ;;                            (add-hook 'evil-insert-state-exit-hook
+    ;;                                      #'org-appear-manual-stop
+    ;;                                      nil
+    ;;                                      t)))
+    )
   )
-
-(use-package org-bullets
-  :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-(defun efs/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :hook (org-mode . efs/org-mode-visual-fill))
 
 ;;; Markdown
 (use-package markdown-mode
@@ -468,27 +562,27 @@
   (setq evil-want-C-u-delete t)
   (setq evil-want-C-i-jump nil)
   (setq evil-want-C-w-delete t)
+  (setq x-select-enable-clipboard nil)
   ;; :hook (evil-mode . evil-hook)
   :config
   (evil-mode 1)
 
-  (setq x-select-enable-clipboard nil)
-  (define-key evil-normal-state-map  (kbd "s-v") (kbd "\"+p"))
-  (define-key evil-insert-state-map  (kbd "s-v") (kbd "C-r +"))
-  (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
-  (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
-  (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "C-r +"))
-  
-
   (evil-set-undo-system 'undo-redo)
+  
+  (define-key evil-normal-state-map  (kbd "s-v") (kbd "\"+p"))
+  (define-key evil-normal-state-map (kbd "-") 'dired-jump)
+  (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
+  (define-key evil-normal-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
+
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map  (kbd "s-v") (kbd "C-r +"))
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
 
-  (define-key evil-normal-state-map (kbd "-") 'dired-jump)
-  (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
-  (define-key evil-normal-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
+  (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
+  (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
+  (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "C-r +"))
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -695,7 +789,7 @@
  ;; If there is more than one, they won't work right.
  '(mini-frame-show-parameters '((top . 0) (width . 1.0) (left . 0.5) (height . 15)))
  '(package-selected-packages
-   '(emacs-mini-frame which-key visual-fill-column use-package unicode-fonts smex simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-modeline counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
+   '(org-appear emacs-mini-frame which-key visual-fill-column use-package unicode-fonts smex simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-modeline counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
