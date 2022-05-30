@@ -511,15 +511,13 @@
   :diminish projectile-mode
   :config (projectile-mode)
   :custom ((projectile-completion-system 'ivy))
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
   :init
   (when (file-directory-p "~/repo/hkms/")
     (setq projectile-project-search-path '("~/repo/hkms/")))
   (setq projectile-switch-prject-action #'projectile-dired))
 
 (use-package counsel
-  :config
+  :init
   (setq counsel-yank-pop-preselect-last t)
   :bind (("M-x" . counsel-M-x)
          ("C-x C-b" . counsel-ibuffer)
@@ -578,6 +576,7 @@
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
 
   (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
+
   (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
   (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "C-r +"))
 
