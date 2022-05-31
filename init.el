@@ -34,6 +34,9 @@
 (setq desktop-path '("~/.cache/emacs/"))
 ;;(desktop-read)
 
+; (setq mac-command-modifier 'meta)
+(setq mac-option-modifier 'meta)
+
 (show-paren-mode t)
 (setq show-paren-style 'parenthesses)
 ;;显示语法高亮
@@ -45,12 +48,20 @@
 (windmove-default-keybindings)
 
 (setq
+ make-backup-files t
+ vc-make-backup-files t
  backup-by-copying t      ; don't clobber symlinks
- backup-directory-alist '(("." . "~/.cache/emacs/backup"))    ; don't litter my fs tree
  delete-old-versions t
- kept-new-versions 6
+ kept-new-versions 256
  kept-old-versions 2
  version-control t)       ; use versioned backups
+(setq hl-backup-dir "~/.cache/emacs/backup/")
+(if (not (file-exists-p hl-backup-dir))
+    (make-directory hl-backup-dir))
+; (add-to-list 'backup-directory-alist '(("." . hl-backup-dir)))
+; (setq backup-directory-alist '((cons "." hl-backup-dir)))
+;; (if (file-exists-p "~/.cache/emacs/backup/")
+;;                    (message "hello"))
 
 ;; set default font
 (set-face-attribute 
@@ -80,6 +91,8 @@
 (set-clipboard-coding-system 'utf-8)
 (set-file-name-coding-system 'utf-8)
 (set-language-environment "UTF-8")
+
+(setq-default fill-column 80)
 
 ;;内部有个自动补全功能，根据当前buffer的内容、文件名、剪切板等自动补全
 (setq hippie-expand-try-functions-list
@@ -112,6 +125,7 @@
         ("n" "note" entry (file "~/repo/hkms/notes.org")
          "* Note %<%Y-%m-%d %H:%M>\n%?")))
 (setq-default indent-tabs-mode nil)
+(setq-default tab-always-indent 'complete)
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
 
@@ -155,7 +169,6 @@
 (setq use-package-always-ensure t)
 
 (use-package dashboard
-  :ensure t
   :config
   (dashboard-setup-startup-hook)
   ;; Set the title
@@ -216,6 +229,36 @@
   (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   )
 
+(use-package git-gutter
+  :hook (prog-mode . git-gutter-mode)
+  :config
+  ;; (global-git-gutter-mode +1)
+  (custom-set-variables
+   '(git-gutter:handled-backends '(git hg bzr svn))
+   '(git-gutter:window-width 1)
+   '(git-gutter:update-interval 0.02)
+   ;; '(git-gutter:modified-sign "=")
+   ;; '(git-gutter:added-sign "+")
+   ;; '(git-gutter:deleted-sign "-")
+   ;; '(git-gutter:unchanged-sign nil)
+   '(git-gutter:disabled-modes '(asm-mode image-mode))
+   '(git-gutter:hide-gutter t) ;; hide gutter when there are no changes
+   '(git-gutter:diff-option "-w") ;; diff option
+   )
+  (add-to-list 'git-gutter:update-hooks 'focus-in-hook)
+
+  ;; (set-face-background 'git-gutter:modified "purple") ;; background color
+  ;; (set-face-foreground 'git-gutter:added "green")
+  ;; (set-face-foreground 'git-gutter:deleted "red")
+  ;; (set-face-background 'git-gutter:unchanged "yellow")
+  )
+(use-package git-gutter-fringe
+  :config
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom)
+  )
+
 (use-package paredit
   :config
   (paredit-mode))
@@ -225,7 +268,6 @@
 
 ;; MARK: doom-theme
 (use-package doom-themes
-  :ensure t
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
@@ -252,15 +294,13 @@
 ;; switch themes
 (define-key emacs-lisp-mode-map (kbd "C-x M-t") 'counsel-load-theme)
 
-(use-package all-the-icons
-  :ensure t)
+(use-package all-the-icons)
 (use-package all-the-icons-dired
   :hook (dired-mode . all-the-icons-dired-mode)
   :config
   (setq all-the-icons-dired-monochrome nil))
 
 (use-package doom-modeline
-  :ensure t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
@@ -301,6 +341,16 @@
   "fa" '(counsel-ag :which-key "ag")
   "ct" '(org-capture :which-key "Org Capture")
   "ad" '(org-agenda :which-key "Org Agenda")
+
+  ;; Jump to next/previous hunk
+  "[h" '(git-gutter:previous-hunk :which-key "git-gutter previous-hunk")
+  "]h" '(git-gutter:next-hunk :which-key "git-gutter next-hunk")
+
+  "hp" '(git-gutter:popup-hunk :which-key "git-gutter pop-hunk")
+  ;; Stage current hunk
+  "hs" '(git-gutter:stage-hunk :which-key "git-gutter stage-hunk")
+  ;; Revert current hunk
+  "hu" '(git-gutter:revert-hunk :which-key "git-gutter revert-hunk")
   )
 
 (use-package exec-path-from-shell
@@ -327,25 +377,6 @@
                           '(("^ *\\([+]\\) "
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
 
-  ;; ;; Set faces for heading levels
-  ;; (dolist (face '((org-level-1 . 2.0)
-  ;;                 (org-level-2 . 1.5)
-  ;;                 (org-level-3 . 1.3)
-  ;;                 (org-level-4 . 1.2)
-  ;;                 (org-level-5 . 1.1)
-  ;;                 (org-level-6 . 1.1)
-  ;;                 (org-level-7 . 1.1)
-  ;;                 (org-level-8 . 1.1)))
-  ;;   (set-face-attribute (car face) nil :font "LXGW WenKai Mono" :weight 'regular :height (cdr face)))
-
-  ;; ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  ;; (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  ;; (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
   (custom-set-faces
    '(org-level-1 ((t (:inherit outline-1 :height 1.3))))
    '(org-level-2 ((t (:inherit outline-2 :height 1.25))))
@@ -451,22 +482,18 @@
           org-appear-trigger 'always)
     :config
     (add-hook 'org-mode-hook 'org-appear-mode)
-    ;; (setq org-appear-trigger 'manual)
-    ;; (add-hook 'org-mode-hook (lambda ()
-    ;;                            (add-hook 'evil-insert-state-entry-hook
-    ;;                                      #'org-appear-manual-start
-    ;;                                      nil
-    ;;                                      t)
-    ;;                            (add-hook 'evil-insert-state-exit-hook
-    ;;                                      #'org-appear-manual-stop
-    ;;                                      nil
-    ;;                                      t)))
+    )
+  (use-package toc-org
+    :config
+    (add-hook 'org-mode-hook 'toc-org-mode)
+    ;; enable in markdown, too
+    ;; (add-hook 'markdown-mode-hook 'toc-org-mode)
+    ;; (define-key markdown-mode-map (kbd "C\-c C-o") 'toc-org-markdown-follow-thing-at-point)
     )
   )
 
 ;;; Markdown
 (use-package markdown-mode
-  :ensure t
   :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown"))
                                         ;(define-key global-map (kbd "C-c t") telega-prefix-map)
@@ -633,7 +660,7 @@
   (setq evil-want-C-u-scroll t)
   (setq evil-want-C-d-scroll t)
   (setq evil-want-C-u-delete t)
-  (setq evil-want-C-i-jump nil)
+  (setq evil-want-C-i-jump t)
   (setq evil-want-C-w-delete t)
   (setq x-select-enable-clipboard nil)
   ;; :hook (evil-mode . evil-hook)
@@ -652,6 +679,7 @@
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
+  (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
 
   (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
 
@@ -666,17 +694,14 @@
   (evil-set-initial-state 'dashboard-mode 'normal)
 
   (use-package evil-leader
-    :ensure t
     :config
     (global-evil-leader-mode))
   
   (use-package evil-surround
-    :ensure t
     :config
     (global-evil-surround-mode))
 
-  (use-package evil-indent-textobject
-    :ensure t)
+  (use-package evil-indent-textobject)
 
   ;;  (use-package evil-search-highlight-persist
   ;;    :config
@@ -691,12 +716,10 @@
   (use-package evil-numbers)
   (use-package evil-collection
     :after evil
-    :ensure t
     :config
     (evil-collection-init))
 
   (use-package evil-org
-    :ensure t
     :after org
     :hook (org-mode . (lambda () evil-org-mode))
     :config
@@ -740,7 +763,6 @@
         company-eclim-auto-save nil          ; Stop eclim auto save.
         company-dabbrev-downcase nil        ; No downcase when completion.
         company-idle-delay 0.5              ; 开始自动补全前的延迟秒数。输入前缀长度必须要满足 company-minimum-prefix-length，该值为 nil 表示没有延迟。
-        tab-always-indent 'complete
         company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil
         company-dabbrev-code-ignore-case t
@@ -753,7 +775,6 @@
            company-xcode
            )
           (company-abbrev company-dabbrev)))
-  :ensure t
   :config
   (global-company-mode t)
   ;; Enable downcase only when completing the completion.
@@ -864,11 +885,21 @@
   (message (buffer-file-name))
   (kill-new (file-truename buffer-file-name))
   )
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-level-1 ((t (:inherit outline-1 :height 1.3))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.25))))
+ '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
+ '(org-level-4 ((t (:inherit outline-4 :height 1.15))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.1)))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(mini-frame-show-parameters '((top . 0) (width . 1.0) (left . 0.5) (height . 15)))
+ '(ignored-local-variable-values '((toc-org-max-depth . 4)))
  '(package-selected-packages
-   '(evil-org org-appear emacs-mini-frame which-key visual-fill-column use-package unicode-fonts smex simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-modeline counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
+   '(git-gutter which-key visual-fill-column use-package unicode-fonts toc-org smex sis simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets org-appear mini-frame markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))

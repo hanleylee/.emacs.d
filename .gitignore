@@ -6,6 +6,7 @@
 *.elc
 auto-save-list
 tramp
+eln-cache
 .\#*
 
 # Org-mode
