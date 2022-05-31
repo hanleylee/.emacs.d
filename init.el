@@ -25,7 +25,8 @@
 ;; 剪贴板最大条目 1000
 (setq kill-ring-max 1000)
 ;; 一行最多显示 150
-(setq default-fill-column 150)
+(setq-default fill-column 150)
+
 ;; 默认 major-mode 为 text-mode
 (setq default-major-mode 'text-mode)
 (column-number-mode)
@@ -56,6 +57,7 @@
  kept-old-versions 2
  version-control t)       ; use versioned backups
 (setq hl-backup-dir "~/.cache/emacs/backup/")
+(setq backup-directory-alist `(("." . "~/.cache/emacs/backup/")))
 (if (not (file-exists-p hl-backup-dir))
     (make-directory hl-backup-dir))
 ; (add-to-list 'backup-directory-alist '(("." . hl-backup-dir)))
@@ -75,8 +77,7 @@
                                         ; (set-fontset-font t '(#x4E00 . #x9ffc) (font-spec :family "Microsoft YaHei" :size 18))
 
 (setq shell-file-name (executable-find "/bin/zsh"))
-;;(set-default 'cursor-type 'hbar)
-(setq org-directory "~/org/")
+(setq org-directory "~/repo/hkms/")
 (setq user-full-name "Hanley Lee"
       user-mail-address "hanley.lei@gmail.com")
 
@@ -91,8 +92,6 @@
 (set-clipboard-coding-system 'utf-8)
 (set-file-name-coding-system 'utf-8)
 (set-language-environment "UTF-8")
-
-(setq-default fill-column 80)
 
 ;;内部有个自动补全功能，根据当前buffer的内容、文件名、剪切板等自动补全
 (setq hippie-expand-try-functions-list
@@ -355,6 +354,10 @@
 
 (use-package exec-path-from-shell
   :config
+  ;; (setq exec-path-from-shell-arguments '("-l"))
+  (setq exec-path-from-shell-arguments nil)
+  (dolist (var '("HL_LANG" "HL_LANG_PYTHON"))
+    (add-to-list 'exec-path-from-shell-variables var))
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize))
   )
@@ -389,6 +392,7 @@
 (use-package org
   ;; :hook (org-mode . efs/org-mode-setup)
   :config
+  (setq org-startup-with-inline-images t)
   (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
   (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
   (setq org-ellipsis " ···")
@@ -900,6 +904,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(git-gutter:diff-option "-w")
+ '(git-gutter:disabled-modes '(asm-mode image-mode))
+ '(git-gutter:handled-backends '(git hg bzr svn))
+ '(git-gutter:hide-gutter t)
+ '(git-gutter:update-interval 0.02)
+ '(git-gutter:window-width 1)
  '(ignored-local-variable-values '((toc-org-max-depth . 4)))
  '(package-selected-packages
-   '(git-gutter which-key visual-fill-column use-package unicode-fonts toc-org smex sis simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets org-appear mini-frame markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
+   '(org-yt git-gutter which-key visual-fill-column use-package unicode-fonts toc-org smex sis simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets org-appear mini-frame markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
