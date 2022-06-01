@@ -56,14 +56,12 @@
  kept-new-versions 256
  kept-old-versions 2
  version-control t)       ; use versioned backups
-(setq hl-backup-dir "~/.cache/emacs/backup/")
-(setq backup-directory-alist `(("." . "~/.cache/emacs/backup/")))
+
+(setq hl-backup-dir (concat (getenv "XDG_CACHE_HOME") "/emacs/backup/"))
 (if (not (file-exists-p hl-backup-dir))
     (make-directory hl-backup-dir))
-; (add-to-list 'backup-directory-alist '(("." . hl-backup-dir)))
-; (setq backup-directory-alist '((cons "." hl-backup-dir)))
-;; (if (file-exists-p "~/.cache/emacs/backup/")
-;;                    (message "hello"))
+(setq backup-directory-alist `(("." . ,hl-backup-dir)))
+; (add-to-list 'backup-directory-alist '(("." . ,hl-backup-dir)))
 
 ;; set default font
 (set-face-attribute 
@@ -77,7 +75,7 @@
                                         ; (set-fontset-font t '(#x4E00 . #x9ffc) (font-spec :family "Microsoft YaHei" :size 18))
 
 (setq shell-file-name (executable-find "/bin/zsh"))
-(setq org-directory "~/repo/hkms/")
+(setq org-directory (getenv "HKMS"))
 (setq user-full-name "Hanley Lee"
       user-mail-address "hanley.lei@gmail.com")
 
@@ -237,18 +235,21 @@
 (use-package git-gutter
   :hook (prog-mode . git-gutter-mode)
   :config
-  ;; (global-git-gutter-mode +1)
+  (global-git-gutter-mode +1)
   (custom-set-variables
    '(git-gutter:handled-backends '(git hg bzr svn))
    '(git-gutter:window-width 1)
-   '(git-gutter:update-interval 0.02)
+   '(git-gutter:update-interval 0.2)
    ;; '(git-gutter:modified-sign "=")
    ;; '(git-gutter:added-sign "+")
    ;; '(git-gutter:deleted-sign "-")
    ;; '(git-gutter:unchanged-sign nil)
    '(git-gutter:disabled-modes '(asm-mode image-mode))
    '(git-gutter:hide-gutter t) ;; hide gutter when there are no changes
-   '(git-gutter:diff-option "-w") ;; diff option
+   ;; '(git-gutter:revision-set-p t)
+   ;; '(git-gutter:start-revision "HEAD")
+   ;; '(git-gutter:diff-option "HEAD") ;; diff option
+   ;; ((prog-mode . ((git-gutter:start-revision . "HEAD"))))
    )
   (add-to-list 'git-gutter:update-hooks 'focus-in-hook)
 
@@ -358,15 +359,16 @@
   "hu" '(git-gutter:revert-hunk :which-key "git-gutter revert-hunk")
   )
 
-(use-package exec-path-from-shell
-  :config
-  ;; (setq exec-path-from-shell-arguments '("-l"))
-  (setq exec-path-from-shell-arguments nil)
-  (dolist (var '("HL_LANG" "HL_LANG_PYTHON"))
-    (add-to-list 'exec-path-from-shell-variables var))
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize))
-  )
+;; Emacs-Plus 不能读取环境变量, 需要使用此 package, Emacs-mac 则可以直接读取到环境变量
+;; (use-package exec-path-from-shell
+;;   :config
+;;   ;; (setq exec-path-from-shell-arguments '("-l"))
+;;   (setq exec-path-from-shell-arguments nil)
+;;   (dolist (var '("HL_LANG" "HL_LANG_PYTHON"))
+;;     (add-to-list 'exec-path-from-shell-variables var))
+;;   (when (memq window-system '(mac ns x))
+;;     (exec-path-from-shell-initialize))
+;;   )
 
 ;; (use-package helm
 ;;   :config (require 'helm-config))
@@ -395,21 +397,42 @@
    )
   )
 
+;;;###autoload
+(defun +org-http-image-data-fn (protocol link _description)
+  "Interpret LINK as an URL to an image file."
+  (when (and (image-type-from-file-name link)
+             (not (eq org-display-remote-inline-images 'skip)))
+    (if-let (buf (url-retrieve-synchronously (concat protocol ":" link)))
+        (with-current-buffer buf
+          (goto-char (point-min))
+          (re-search-forward "\r?\n\r?\n" nil t)
+          (buffer-substring-no-properties (point) (point-max)))
+      (message "Download of image \"%s\" failed" link)
+      nil)))
+
 (use-package org
   ;; :hook (org-mode . efs/org-mode-setup)
   :config
-  (setq org-startup-with-inline-images t)
   (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
-  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
-  (setq org-ellipsis " ···")
-  (setq truncate-lines nil)
-  (setq org-hide-emphasis-markers t)
-  (setq org-hide-leading-stars t)
-  (setq org-fontify-done-headline t)
-  (setq org-pretty-entities t)
-  (setq org-odd-level-only t)
-  (setq org-src-fontify-natively t)
-  (setq org-src-tab-acts-natively t)
+  ;; (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+  (org-link-set-parameters "http"  :image-data-fun #'+org-http-image-data-fn)
+  (org-link-set-parameters "https" :image-data-fun #'+org-http-image-data-fn)
+  (org-link-set-parameters "img"   :image-data-fun #'+org-inline-image-data-fn)
+  (setq org-image-actual-width nil
+        org-display-remote-inline-images 'download
+        ;; org-display-remote-inline-images 'cache
+        org-startup-with-inline-images "inlineimages"
+        org-startup-indented t
+        org-ellipsis " ···"
+        truncate-lines nil
+        org-hide-emphasis-markers t
+        org-hide-leading-stars t
+        org-fontify-done-headline t
+        org-pretty-entities t
+        org-odd-level-only t
+        org-src-fontify-natively t
+        org-src-tab-acts-natively t
+        )
   (setq org-todo-keywords '((type "工作(w!)" "学习(s!)" "休闲(l!)" "|")
                             (sequence "TODO(t!)" "DOING(i!)" "|" "DONE(d!)" "ABORT(a!)")
                             ))
@@ -452,11 +475,10 @@
           ;;纪念日
           (holiday-fixed 1 1 "儿子生日")
           (holiday-lunar 2 2 "老婆生日"  0)
-          (holiday-lunar 3 3 "我的生日" 0)
+          (holiday-fixed 8 1 "我的生日" 0)
           ))
   (setq calendar-holidays my-holidays)  ;只显示我定制的节假日
   (setq org-use-fast-todo-selection t)
-  (setq org-startup-indented t)
   (setq org-agenda-files (list "/Users/hanley/repo/hkms/"))
   (setq org-agenda-ndays 21)
   (setq org-agenda-include-diary t)
@@ -787,7 +809,6 @@
            company-yasnippet
            company-keywords
            company-capf
-           company-xcode
            )
           (company-abbrev company-dabbrev)))
   :config
@@ -910,17 +931,3 @@
  '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
  '(org-level-4 ((t (:inherit outline-4 :height 1.15))))
  '(org-level-5 ((t (:inherit outline-5 :height 1.1)))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(git-gutter:diff-option "-w")
- '(git-gutter:disabled-modes '(asm-mode image-mode))
- '(git-gutter:handled-backends '(git hg bzr svn))
- '(git-gutter:hide-gutter t)
- '(git-gutter:update-interval 0.02)
- '(git-gutter:window-width 1)
- '(ignored-local-variable-values '((toc-org-max-depth . 4)))
- '(package-selected-packages
-   '(org-yt git-gutter which-key visual-fill-column use-package unicode-fonts toc-org smex sis simpleclip rainbow-delimiters parinfer-rust-mode paredit org-bullets org-appear mini-frame markdown-mode magit ivy-rich ivy-posframe helpful helm general exec-path-from-shell evil-visualstar evil-surround evil-search-highlight-persist evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode atom-one-dark-theme all-the-icons-dired ag ack)))
