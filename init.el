@@ -35,7 +35,7 @@
 (setq desktop-path '("~/.cache/emacs/"))
 ;;(desktop-read)
 
-; (setq mac-command-modifier 'meta)
+(setq mac-command-modifier 'super)
 (setq mac-option-modifier 'meta)
 
 (show-paren-mode t)
@@ -132,8 +132,14 @@
 (setq recentf-max-menu-items 25)
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 
+;; MARK: Global set key
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+;; MARK: Global set key - Command
+(global-set-key (kbd "s-=") 'text-scale-increase)
+(global-set-key (kbd "s--") 'text-scale-decrease)
+(global-set-key (kbd "s-s") 'save-buffer)
 
 (column-number-mode)
 (global-display-line-numbers-mode t)
@@ -638,6 +644,11 @@
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
+(use-package simpleclip
+  :config
+  (simpleclip-mode 1)
+  )
+
 (defun evil-hook ()
   (dolist (mode '(custom-mode
                   eshell-mode
@@ -673,22 +684,22 @@
 
   (evil-set-undo-system 'undo-redo)
   
-  (define-key evil-normal-state-map  (kbd "s-v") (kbd "\"+p"))
+  ;; (define-key evil-normal-state-map  (kbd "s-v") (kbd "\"+p"))
   (define-key evil-normal-state-map (kbd "-") 'dired-jump)
   (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
 
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "s-v") (kbd "C-r +"))
+  ;; (define-key evil-insert-state-map (kbd "s-v") (kbd "C-r +"))
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
   (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
 
-  (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
+  ;; (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
 
-  (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
-  (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "C-r +"))
+  ;; (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
+  ;; (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "C-r +"))
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
