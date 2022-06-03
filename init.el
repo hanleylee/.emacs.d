@@ -63,6 +63,9 @@
 (setq backup-directory-alist `(("." . ,hl-backup-dir)))
 ; (add-to-list 'backup-directory-alist '(("." . ,hl-backup-dir)))
 
+;; (add-to-list 'load-path "~/.emacs.d/lisp/") ;; this will not add its subdir to load-path, as https://www.emacswiki.org/emacs/LoadPath
+(let ((default-directory "~/.emacs.d/lisp/"))
+  (normal-top-level-add-subdirs-to-load-path))
 ;; set default font
 (set-face-attribute 
  'default nil :font (font-spec :family "FiraCode Nerd Font Mono" :size 16))
@@ -104,7 +107,7 @@
         try-expand-line
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
-;;按ALT+/ 键进行补全
+;; 按ALT+/ 键进行补全
 (global-set-key (kbd "M-/") 'hippie-expand)
 ;;一个好用的minibuffer插件ido，许多插件都基于它。
 (ido-mode t)
@@ -209,7 +212,7 @@
           ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
             "Homepage"
             "Browse homepage"
-            (lambda (&rest _) (browse-url "homepage")))
+            (lambda (&rest _) (browse-url "https://github.com/hanleylee")))
            ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
            ("?" "" "?/h" #'show-help nil "<" ">"))
           ;; line 2
@@ -288,7 +291,10 @@
   (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+  (doom-themes-org-config)
+  ;; (custom-set-variables `(doom-modeline-height 15))
+  (advice-add #'fit-window-to-buffer :before (lambda (&rest _) (redisplay t)))
+  )
 
 ;; save commnad history
 (use-package smex
@@ -344,19 +350,14 @@
   "C-b" '(counsel-switch-buffer :which-key "Buffer")
   "C-g" '(show-file-name :which-key "Show file name")
   "gs" '(magit-status :which-key "Magit Status")
-  "fa" '(counsel-ag :which-key "ag")
   "ct" '(org-capture :which-key "Org Capture")
   "ad" '(org-agenda :which-key "Org Agenda")
+
+  "<DEL>" '(evil-ex-nohighlight :which-key "Remove highlight")
 
   ;; Jump to next/previous hunk
   "[h" '(git-gutter:previous-hunk :which-key "git-gutter previous-hunk")
   "]h" '(git-gutter:next-hunk :which-key "git-gutter next-hunk")
-
-  "hp" '(git-gutter:popup-hunk :which-key "git-gutter pop-hunk")
-  ;; Stage current hunk
-  "hs" '(git-gutter:stage-hunk :which-key "git-gutter stage-hunk")
-  ;; Revert current hunk
-  "hu" '(git-gutter:revert-hunk :which-key "git-gutter revert-hunk")
   )
 
 ;; Emacs-Plus 不能读取环境变量, 需要使用此 package, Emacs-mac 则可以直接读取到环境变量
@@ -389,40 +390,36 @@
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "◦"))))))
 
   (custom-set-faces
+   ;; '(org-level-1 ((t (:inherit outline-1 :height 1.2  :foreground "#FD971F" :bold t)))) 
    '(org-level-1 ((t (:inherit outline-1 :height 1.3))))
    '(org-level-2 ((t (:inherit outline-2 :height 1.25))))
    '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
    '(org-level-4 ((t (:inherit outline-4 :height 1.15))))
    '(org-level-5 ((t (:inherit outline-5 :height 1.1))))
+   ;; '(org-table ((t (:font "LXGW WenKai Mono" :size 18))))
+   '(org-table ((t (:font "LXGW WenKai Mono"))))
+   '(org-headline-done ((t (:strike-through t :foreground "#585858"))))
+   '(org-done ((t (:strike-through t :foreground "#585858"))))
    )
   )
 
-;;;###autoload
-(defun +org-http-image-data-fn (protocol link _description)
-  "Interpret LINK as an URL to an image file."
-  (when (and (image-type-from-file-name link)
-             (not (eq org-display-remote-inline-images 'skip)))
-    (if-let (buf (url-retrieve-synchronously (concat protocol ":" link)))
-        (with-current-buffer buf
-          (goto-char (point-min))
-          (re-search-forward "\r?\n\r?\n" nil t)
-          (buffer-substring-no-properties (point) (point-max)))
-      (message "Download of image \"%s\" failed" link)
-      nil)))
-
 (use-package org
   ;; :hook (org-mode . efs/org-mode-setup)
+  ;; :mode (("\\.org\\'" . org-mode))
   :config
+  (setq org-M-RET-may-split-line nil)
   (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
-  ;; (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
-  (org-link-set-parameters "http"  :image-data-fun #'+org-http-image-data-fn)
-  (org-link-set-parameters "https" :image-data-fun #'+org-http-image-data-fn)
-  (org-link-set-parameters "img"   :image-data-fun #'+org-inline-image-data-fn)
+  (efs/org-font-setup)
+  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+  (add-hook 'org-mode-hook (lambda ()
+                             (setq tab-width 2)
+                             (setq evil-shift-width 2)
+                             ))
   (setq org-image-actual-width nil
         org-display-remote-inline-images 'download
         ;; org-display-remote-inline-images 'cache
         org-startup-with-inline-images "inlineimages"
-        org-startup-indented t
+        ;; org-startup-indented t
         org-ellipsis " ···"
         truncate-lines nil
         org-hide-emphasis-markers t
@@ -433,18 +430,17 @@
         org-src-fontify-natively t
         org-src-tab-acts-natively t
         )
-  (setq org-todo-keywords '((type "工作(w!)" "学习(s!)" "休闲(l!)" "|")
+  (setq org-todo-keywords '(
                             (sequence "TODO(t!)" "DOING(i!)" "|" "DONE(d!)" "ABORT(a!)")
+                            ;; (type "工作(w!)" "学习(s!)" "休闲(l!)" "|")
                             ))
   (setq org-todo-keyword-faces
-  '(("工作" .       (:foreground "blue" :weight bold))
-    ("学习" .       (:foreground "orange" :weight bold))
-    ("休闲" .       (:foreground "cyan" :weight bold)) 
-    ("TODO" .      (:foreground "yellow" :weight bold))
-    ("DOING" .     (:foreground "green" :weight bold))
-    ("DONE" .      (:foreground "gray" :weight bold)) 
-    ("ABORT" .     (:foreground "gray"))
+  '(("TODO" .      (:foreground "#d6a038" :background "#404040" :weight bold))
+    ("DOING" .     (:foreground "#aa72c4" :background "#404040" :weight bold))
+    ("DONE" .      (:foreground "#585858" :background "#404040" :weight bold :strike-through t)) 
+    ("ABORT" .     (:foreground "#585858" :background "#404040" :weight bold :strike-through t :italic t))
     ))
+  (setq calendar-week-start-day 1) ;设置星期一为每周的第一天
   ;; 优先级范围和默认任务的优先级
   (setq org-highest-priority ?A)
   (setq org-lowest-priority  ?E)
@@ -457,9 +453,29 @@
           (?D . (:foreground "purple" :weight bold))
           (?E . (:foreground "green" :weight bold))
           ))
-  (setq org-tag-alist '(("@work" . ?w) ("@home" . ?h) ("laptop" . ?l)))
+  (setq org-tag-alist '(
+                        ("@waittingFor" . ?w)
+                        ("@darktime" . ?d)
+                        ("@metro" . ?m)
+                        ("@tired" . ?t)
+                        ("@shopping" . ?s)
+                        ("@reading" . ?r)
+                        ("@explore" . ?e)
+                        ("@video" . ?v)
+                        )
+        )
+  (setq org-tag-faces
+        '(
+          ("@waittingFor" . (:foreground "#B9B9B9" :background "#464646"))
+          ("@darktime" . (:foreground "#B9B9B9" :background "#464646"))
+          ("@metro" . (:foreground "#B9B9B9" :background "#464646"))
+          ("@tired" . (:foreground "#B9B9B9" :background "#464646"))
+          ("@shopping" . (:foreground "#B9B9B9" :background "#464646"))
+          ("@reading" . (:foreground "#B9B9B9" :background "#464646"))
+          ("@explore" . (:foreground "#B9B9B9" :background "#464646"))
+          ("@video" . (:foreground "#B9B9B9" :background "#464646"))
+          ))
   (setq org-enforce-todo-dependencies t) ;; 如果子任务没有全部完成, 主任务将不能设置为 DONE 状态
-  (setq mark-holidays-in-calendar t)
   (setq my-holidays
         '(;;公历节日
           (holiday-fixed 2 14 "情人节")
@@ -473,16 +489,16 @@
           (holiday-lunar 7 7 "七夕情人节" 0)
           (holiday-lunar 8 15 "中秋节" 0)
           ;;纪念日
-          (holiday-fixed 1 1 "儿子生日")
-          (holiday-lunar 2 2 "老婆生日"  0)
+          (holiday-lunar 1 9 "老婆生日" 0)
           (holiday-fixed 8 1 "我的生日" 0)
           ))
   (setq calendar-holidays my-holidays)  ;只显示我定制的节假日
+  (setq calendar-mark-holidays-flag t) ; 让 calendar 自动标记出节假日的日期(也可以用 x 切换状态)
+  (setq calendar-mark-diary-entries-flag t) ; 让 calendar 自动标记出所有记有待办事项的日期(也可以用 m 切换状态)
   (setq org-use-fast-todo-selection t)
-  (setq org-agenda-files (list "/Users/hanley/repo/hkms/"))
+  (setq org-agenda-files (list "/Users/hanley/repo/todo/"))
   (setq org-agenda-ndays 21)
   (setq org-agenda-include-diary t)
-  (efs/org-font-setup)
   (setq org-list-demote-modify-bullet
       (quote (("+" . "-")
               ("-" . "+")
@@ -497,11 +513,23 @@
               ("B." . "-")
               ("a." . "-")
               ("b." . "-"))))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (clojure . t)
+     (python . t)
+     (ruby . t)
+     (C . t)
+     (java . t)
+     (lua . t)
+     (perl . t)
+     (sqlite . t)))
+  (setq org-confirm-babel-evaluate nil) ; 禁止 emacs 执行前询问
   (use-package org-bullets
     :after org
     :hook (org-mode . org-bullets-mode)
     :custom
-    (org-bullets-bullet-list '("●" "◉" "○" "▶" "◇" "◆" "★" "✿" "❀" "✸")))
+    (org-bullets-bullet-list '("●" "◉" "○" "▶" "◆" "◇" "★" "✿" "❀" "✸")))
 
   (use-package org-appear
     :init
@@ -702,21 +730,21 @@
   (setq x-select-enable-clipboard nil)
   ;; :hook (evil-mode . evil-hook)
   :config
-  (evil-mode 1)
+  (evil-mode t)
 
   (evil-set-undo-system 'undo-redo)
-  
+
   ;; (define-key evil-normal-state-map  (kbd "s-v") (kbd "\"+p"))
   (define-key evil-normal-state-map (kbd "-") 'dired-jump)
   (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
 
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  ;; (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   ;; (define-key evil-insert-state-map (kbd "s-v") (kbd "C-r +"))
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
   (define-key evil-insert-state-map (kbd "C-a") 'move-beginning-of-line)
   (define-key evil-insert-state-map (kbd "C-e") 'move-end-of-line)
-  (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
+  ;; (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
 
   ;; (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
 
@@ -727,12 +755,25 @@
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-  (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal)
-
   (use-package evil-leader
     :config
-    (global-evil-leader-mode))
+    (global-evil-leader-mode)
+    (evil-leader/set-leader "\\")
+    (evil-leader/set-key
+      "fa" 'counsel-ag
+      "e" 'find-file
+      "hp" 'git-gutter:popup-hunk
+      ;; Stage current hunk
+      "hs" 'git-gutter:stage-hunk
+      ;; Revert current hunk
+      "hu" 'git-gutter:revert-hunk
+      )
+    (evil-leader/set-key-for-mode
+      'emacs-lisp-mode "b" 'byte-compile-file
+      )
+    ;; (setq evil-leader/no-prefix-mode-rx '("magit-.*-mode" "gnus-.*-mode"))
+    )
+
   
   (use-package evil-surround
     :config
@@ -754,7 +795,12 @@
   (use-package evil-collection
     :after evil
     :config
-    (evil-collection-init))
+    (evil-collection-init)
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    ;; (evil-set-initial-state 'dashboard-mode 'normal)
+
+    (evil-set-initial-state 'calendar-mode 'emacs)
+    )
 
   (use-package evil-org
     :after org
@@ -783,8 +829,8 @@
     ;; enable the /context/ mode for all buffers
     (sis-global-context-mode t)
     ;; enable the /inline english/ mode for all buffers
-    (sis-global-inline-mode t))
-
+    ;; (sis-global-inline-mode t)
+    )
   )
 
 ;; (define-key evil-motion-state-map "," nil)
@@ -931,3 +977,17 @@
  '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
  '(org-level-4 ((t (:inherit outline-4 :height 1.15))))
  '(org-level-5 ((t (:inherit outline-5 :height 1.1)))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(git-gutter:disabled-modes '(asm-mode image-mode))
+ '(git-gutter:handled-backends '(git hg bzr svn))
+ '(git-gutter:hide-gutter t)
+ '(git-gutter:update-interval 0.2)
+ '(git-gutter:window-width 1)
+ '(package-selected-packages
+   '(simpleclip which-key visual-fill-column use-package toc-org smex sis rainbow-delimiters paredit org-bullets org-appear markdown-mode magit ivy-rich ivy-posframe highlight helpful git-gutter-fringe general exec-path-from-shell evil-surround evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode all-the-icons-dired ag ack)))
+
+(load "~/.emacs.d/lisp/taskpaper2org.el")
