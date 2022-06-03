@@ -120,9 +120,9 @@
 ;; (set-frame-height (selected-frame) 103)
 
 (setq org-capture-templates
-      `(("t" "task" entry (file "~/repo/hkms//inbox.org")
+      `(("t" "task" entry (file "~/repo/todo/agenda/inbox.org")
          "* TODO %?\nCaptured %<%Y-%m-%d %H:%M>") 
-        ("n" "note" entry (file "~/repo/hkms/notes.org")
+        ("n" "note" entry (file "~/repo/todo/notes.org")
          "* Note %<%Y-%m-%d %H:%M>\n%?")))
 (setq-default indent-tabs-mode nil)
 (setq-default tab-always-indent 'complete)
@@ -490,13 +490,13 @@
           (holiday-lunar 8 15 "中秋节" 0)
           ;;纪念日
           (holiday-lunar 1 9 "老婆生日" 0)
-          (holiday-fixed 8 1 "我的生日" 0)
+          (holiday-fixed 8 1 "我的生日")
           ))
   (setq calendar-holidays my-holidays)  ;只显示我定制的节假日
   (setq calendar-mark-holidays-flag t) ; 让 calendar 自动标记出节假日的日期(也可以用 x 切换状态)
   (setq calendar-mark-diary-entries-flag t) ; 让 calendar 自动标记出所有记有待办事项的日期(也可以用 m 切换状态)
   (setq org-use-fast-todo-selection t)
-  (setq org-agenda-files (list "/Users/hanley/repo/todo/"))
+  (setq org-agenda-files (list "/Users/hanley/repo/todo/agenda"))
   (setq org-agenda-ndays 21)
   (setq org-agenda-include-diary t)
   (setq org-list-demote-modify-bullet
@@ -525,6 +525,11 @@
      (perl . t)
      (sqlite . t)))
   (setq org-confirm-babel-evaluate nil) ; 禁止 emacs 执行前询问
+  (use-package cal-china-x
+    :config
+    (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+    )
+
   (use-package org-bullets
     :after org
     :hook (org-mode . org-bullets-mode)
@@ -972,11 +977,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-done ((t (:strike-through t :foreground "#585858"))))
+ '(org-headline-done ((t (:strike-through t :foreground "#585858"))))
  '(org-level-1 ((t (:inherit outline-1 :height 1.3))))
  '(org-level-2 ((t (:inherit outline-2 :height 1.25))))
  '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
  '(org-level-4 ((t (:inherit outline-4 :height 1.15))))
- '(org-level-5 ((t (:inherit outline-5 :height 1.1)))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.1))))
+ '(org-table ((t (:font "LXGW WenKai Mono")))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -988,6 +996,6 @@
  '(git-gutter:update-interval 0.2)
  '(git-gutter:window-width 1)
  '(package-selected-packages
-   '(simpleclip which-key visual-fill-column use-package toc-org smex sis rainbow-delimiters paredit org-bullets org-appear markdown-mode magit ivy-rich ivy-posframe highlight helpful git-gutter-fringe general exec-path-from-shell evil-surround evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode all-the-icons-dired ag ack)))
+   '(cal-china-x simpleclip which-key visual-fill-column use-package toc-org smex sis rainbow-delimiters paredit org-bullets org-appear markdown-mode magit ivy-rich ivy-posframe highlight helpful git-gutter-fringe general exec-path-from-shell evil-surround evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode all-the-icons-dired ag ack)))
 
-(load "~/.emacs.d/lisp/taskpaper2org.el")
+;; (load "~/.emacs.d/lisp/taskpaper2org.el")
