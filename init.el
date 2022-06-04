@@ -130,7 +130,8 @@
 (setq indent-line-function 'insert-tab)
 
 (recentf-mode 1)
-(setq recentf-max-menu-items 25)
+(setq recentf-max-menu-items 10000)
+(setq recentf-max-saved-items 10000)
 (global-set-key "\C-x\ \C-r" 'recentf-open-files)
 
 ;; MARK: Global set key
@@ -881,6 +882,8 @@
     )
   )
 
+(use-package swift-mode)
+
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (add-to-list (make-local-variable 'company-backends)
                                                'company-elisp)))
@@ -996,6 +999,6 @@
  '(git-gutter:update-interval 0.2)
  '(git-gutter:window-width 1)
  '(package-selected-packages
-   '(cal-china-x simpleclip which-key visual-fill-column use-package toc-org smex sis rainbow-delimiters paredit org-bullets org-appear markdown-mode magit ivy-rich ivy-posframe highlight helpful git-gutter-fringe general exec-path-from-shell evil-surround evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode all-the-icons-dired ag ack)))
+   '(swift-mode cal-china-x simpleclip which-key visual-fill-column use-package toc-org smex sis rainbow-delimiters paredit org-bullets org-appear markdown-mode magit ivy-rich ivy-posframe highlight helpful git-gutter-fringe general exec-path-from-shell evil-surround evil-org evil-numbers evil-leader evil-indent-textobject evil-commentary evil-collection doom-themes doom-modeline dashboard counsel-projectile company-fuzzy command-log-mode all-the-icons-dired ag ack)))
 
 ;; (load "~/.emacs.d/lisp/taskpaper2org.el")
