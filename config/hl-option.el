@@ -30,9 +30,10 @@
 (column-number-mode)
 
 ;; (desktop-save-mode 1)
-(setq desktop-path '("~/.cache/emacs/"))
+(setq desktop-path '(concat (getenv "XDG_CACHE_HOME") "/emacs/"))
 ;;(desktop-read)
 
+;; MARK: Keys binding
 (setq mac-command-modifier 'super)
 (setq mac-option-modifier 'meta)
 
@@ -40,12 +41,15 @@
 (setq show-paren-style 'parenthesses)
 ;;显示语法高亮
 
-(global-font-lock-mode t)
+(setq display-line-numbers-type 'relative)
+(column-number-mode)
+(global-display-line-numbers-mode t)
 (global-hl-line-mode)
 (blink-cursor-mode 0)
 (winner-mode t)
 (windmove-default-keybindings)
 
+;; MARK: Auto Backup
 (setq
  make-backup-files t
  vc-make-backup-files t
@@ -54,18 +58,21 @@
  kept-new-versions 256
  kept-old-versions 2
  version-control t)       ; use versioned backups
-
 (setq hl-backup-dir (concat (getenv "XDG_CACHE_HOME") "/emacs/backup/"))
 (if (not (file-exists-p hl-backup-dir))
     (make-directory hl-backup-dir))
 (setq backup-directory-alist `(("." . ,hl-backup-dir)))
 ; (add-to-list 'backup-directory-alist '(("." . ,hl-backup-dir)))
-; (setq hl-lock-dir (concat (getenv "XDG_CACHE_HOME") "/emacs/lock/"))
-; (if (not (file-exists-p hl-lock-dir))
-;     (make-directory hl-lock-dir))
-; (add-to-list 'lock-file-name-transforms '(,hl-lock-dir "/tmp/ t"))
 
-;; set default font
+;; MARK: Auto Lock
+(setq hl-lock-dir (concat (getenv "XDG_CACHE_HOME") "/emacs/lock/"))
+(if (not (file-exists-p hl-lock-dir))
+    (make-directory hl-lock-dir))
+; (add-to-list 'lock-file-name-transforms `((".*" "~/.cache/emacs/lock/" t)))
+(setq lock-file-name-transforms `((".*" ,hl-lock-dir t)))
+
+;; MARK: Font
+(global-font-lock-mode t)
 (set-face-attribute 
  'default nil :font (font-spec :family "FiraCode Nerd Font Mono" :size 16))
 (dolist (charset '(kana han cjk-misc bopomofo))
@@ -81,7 +88,7 @@
 (setq user-full-name "Hanley Lee"
       user-mail-address "hanley.lei@gmail.com")
 
-;;设置编码
+;; MARK: Encoding
 (prefer-coding-system 'utf-8)
 (setq default-buffer-file-coding-system 'utf-8)
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
@@ -106,8 +113,6 @@
         try-expand-line
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
-;; 按ALT+/ 键进行补全
-(global-set-key (kbd "M-/") 'hippie-expand)
 ;;一个好用的minibuffer插件ido，许多插件都基于它。
 (ido-mode t)
 (setq ido-enable-flex-matching t)
@@ -126,19 +131,5 @@
 (recentf-mode 1)
 (setq recentf-max-menu-items 10000)
 (setq recentf-max-saved-items 10000)
-(global-set-key "\C-x\ \C-r" 'recentf-open-files)
-
-;; MARK: Global set key
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;; MARK: Global set key - Command
-(global-set-key (kbd "s-=") 'text-scale-increase)
-(global-set-key (kbd "s--") 'text-scale-decrease)
-(global-set-key (kbd "s-s") 'save-buffer)
-
-(column-number-mode)
-(global-display-line-numbers-mode t)
-(setq display-line-numbers-type 'relative)
 
 (provide 'hl-option)

@@ -6,6 +6,9 @@
   ;; (evil-set-initial-state 'dashboard-mode 'normal)
 
   (evil-set-initial-state 'calendar-mode 'emacs)
+  (evil-collection-define-key 'normal 'dired-mode-map
+    " " 'dired-mark
+    )
   )
 
 (provide 'hl-evil-collection)

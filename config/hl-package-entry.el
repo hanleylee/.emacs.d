@@ -35,12 +35,15 @@
 (require 'hl-doom-modeline)
 (require 'hl-git-gutter)
 (require 'hl-git-gutter-fringe)
+;; (require 'hl-diff-hl)
+
 (require 'hl-all-the-icons)
 (require 'hl-all-the-icons-dired)
 (require 'hl-highlight)
 
 ;; Functional
 ;; (require 'hl-exec-path-from-shell)
+(require 'hl-undo-tree)
 (require 'hl-command-log-mode)
 (require 'hl-evil)
 (require 'hl-evil-leader)

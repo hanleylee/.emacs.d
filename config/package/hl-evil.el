@@ -82,7 +82,7 @@
   :config
   (evil-mode t)
 
-  (evil-set-undo-system 'undo-redo)
+  (evil-set-undo-system 'undo-tree)
 
   ;; (define-key evil-normal-state-map  (kbd "s-v") (kbd "\"+p"))
   (define-key evil-normal-state-map (kbd "-") 'dired-jump)
