@@ -5,7 +5,6 @@
   (evil-leader/set-leader "\\")
   (evil-leader/set-key
     "fa" 'counsel-ag
-    "e" 'find-file
     "hp" 'git-gutter:popup-hunk
     ;; Stage current hunk
     "hs" 'git-gutter:stage-hunk

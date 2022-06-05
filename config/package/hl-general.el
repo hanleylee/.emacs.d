@@ -9,7 +9,7 @@
 (rune/leader-keys
   "t" '(:ignore t :which-key "Toggles")
   "tt" '(counsel-load-theme :which-key "Choose theme")
-  "C-h" '(counsel-buffer-or-recentf :which-key "Recentf or buffer")
+  "C-h" '(counsel-recentf :which-key "Recentf")
   "C-f" '(counsel-projectile-find-file :which-key "Project file")
   "C-b" '(counsel-switch-buffer :which-key "Buffer")
   "C-g" '(show-file-name :which-key "Show file name")

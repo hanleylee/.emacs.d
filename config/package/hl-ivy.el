@@ -20,7 +20,7 @@
   (ivy-mode 1)
   (setq enable-recursive-minibuffers t)
   (setq ivy-wrap t)
-  (setq ivy-height 50)
+  (setq ivy-height 30)
   (setq use-virtual-buffers t)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-extra-directories nil)

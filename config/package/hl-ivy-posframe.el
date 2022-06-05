@@ -2,7 +2,7 @@
 (use-package ivy-posframe
   ;; display at `ivy-posframe-style'
   :config
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
+  ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
   (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
   ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
   ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
@@ -11,7 +11,8 @@
   ;; Different command can use different display function.
   (setq ivy-posframe-parameters
         '((left-fringe . 8)
-          (right-fringe . 8)))
+          (right-fringe . 8)
+          (alpha . 50)))
 
   (defun my-ivy-posframe-get-size ()
     "Set the ivy-posframe size according to the current frame."
