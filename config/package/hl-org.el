@@ -29,8 +29,8 @@
   ;; :mode (("\\.org\\'" . org-mode))
   :config
   (setq org-capture-templates
-        `(("t" "task" entry (file "~/repo/todo/agenda/inbox.org") "* TODO %?\nCaptured %<%Y-%m-%d %H:%M>") 
-          ("n" "note" entry (file "~/repo/todo/notes.org") "* Note %<%Y-%m-%d %H:%M>\n%?")))
+        `(("t" "task" entry (file ,hl-inbox-file) "* TODO %?\nCaptured %<%Y-%m-%d %H:%M>") 
+          ("n" "note" entry (file ,hl-notes-file) "* Note %<%Y-%m-%d %H:%M>\n%?")))
 
   (setq org-M-RET-may-split-line nil)
   (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
@@ -121,7 +121,7 @@
   (setq calendar-mark-holidays-flag t) ; 让 calendar 自动标记出节假日的日期(也可以用 x 切换状态)
   (setq calendar-mark-diary-entries-flag t) ; 让 calendar 自动标记出所有记有待办事项的日期(也可以用 m 切换状态)
   (setq org-use-fast-todo-selection t)
-  (setq org-agenda-files (list "/Users/hanley/repo/todo/agenda"))
+  (setq org-agenda-files (list (concat hl-todo-dir "/agenda")))
   (setq org-agenda-ndays 21)
   (setq org-agenda-include-diary t)
   (setq org-list-demote-modify-bullet

@@ -51,6 +51,12 @@
 (winner-mode t)
 (windmove-default-keybindings)
 
+(setq insert-directory-program "gls" dired-use-ls-dired t)
+(setq dired-listing-switches "-lhiaG --group-directories-first")
+;; (require 'ls-lisp)
+;; (setq ls-lisp-dirs-first t)
+;; (setq ls-lisp-use-insert-directory-program nil)
+
 ;; MARK: Auto Backup
 (setq
  make-backup-files t
@@ -60,14 +66,10 @@
  kept-new-versions 256
  kept-old-versions 2
  version-control t)       ; use versioned backups
-(setq hl-backup-dir (concat (getenv "XDG_CACHE_HOME") "/emacs/backup/"))
-(hl-guard-dir-exists hl-backup-dir)
 (setq backup-directory-alist `(("." . ,hl-backup-dir)))
 ; (add-to-list 'backup-directory-alist '(("." . ,hl-backup-dir)))
 
 ;; MARK: Auto Lock
-(setq hl-lock-dir (concat (getenv "XDG_CACHE_HOME") "/emacs/lock/"))
-(hl-guard-dir-exists hl-lock-dir)
 ; (add-to-list 'lock-file-name-transforms `((".*" "~/.cache/emacs/lock/" t)))
 (setq lock-file-name-transforms `((".*" ,hl-lock-dir t)))
 
