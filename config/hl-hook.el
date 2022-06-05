@@ -1,3 +1,5 @@
+(provide 'hl-hook)
+
 ;; Disable line number for some modes
 (dolist (mode '(org-mode-hook
                 term-mode-hook
@@ -8,7 +10,3 @@
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (add-to-list (make-local-variable 'company-backends)
                                                'company-elisp)))
-
-
-
-(provide 'hl-hook)

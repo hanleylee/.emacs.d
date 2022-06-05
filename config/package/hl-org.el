@@ -1,3 +1,5 @@
+(provide 'hl-org)
+
 ;;; Org mode
 (defun efs/org-font-setup ()
   ;; Replace list hyphen with dot
@@ -179,6 +181,3 @@
     ;; (define-key markdown-mode-map (kbd "C\-c C-o") 'toc-org-markdown-follow-thing-at-point)
     )
   )
-
-
-(provide 'hl-org)

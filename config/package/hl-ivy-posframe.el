@@ -1,3 +1,4 @@
+(provide 'hl-ivy-posframe)
 
 (use-package ivy-posframe
   ;; display at `ivy-posframe-style'
@@ -33,5 +34,3 @@
   ;;         (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
   ;;         (t               . ivy-posframe-display)))
   (ivy-posframe-mode 1))
-
-(provide 'hl-ivy-posframe)

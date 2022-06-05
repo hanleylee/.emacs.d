@@ -1,5 +1,7 @@
 ;;; Packages entry
 
+(provide 'hl-package-entry)
+
 ;; Set up package.el to work with MELPA
 (require 'package)
 ;;(add-to-list 'package-archives
@@ -77,6 +79,3 @@
 (require 'hl-projectile)
 (require 'hl-counsel)
 (require 'hl-counsel-projectile)
-
-;; Require
-(provide 'hl-package-entry)

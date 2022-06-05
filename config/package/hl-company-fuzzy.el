@@ -1,3 +1,5 @@
+(provide 'hl-company-fuzzy)
+
 (use-package company-fuzzy
   :hook (company-mode . company-fuzzy-mode)
   :init
@@ -13,6 +15,3 @@
   ;; ;; Some backends doesn't allow me to get the list of candidates by passing the possible prefix; hence I have created this type of special scenario
   ;; (add-to-list 'company-fuzzy-history-backends 'company-yasnippet)
   )
-
-
-(provide 'hl-company-fuzzy)

@@ -1,3 +1,5 @@
+(provide 'hl-evil)
+
 ;; (evil-add-hjkl-bindings recentf-dialog 'emacs
 ;;   (kbd "/")       'evil-search-forward
 ;;   (kbd "n")       'evil-search-next
@@ -88,6 +90,8 @@
   (define-key evil-normal-state-map (kbd "-") 'dired-jump)
   (define-key evil-normal-state-map (kbd "C-S-a") 'evil-numbers/inc-at-pt)
   (define-key evil-normal-state-map (kbd "C-S-x") 'evil-numbers/dec-at-pt)
+  (define-key evil-normal-state-map (kbd "C-j") (concat ":m +1" (kbd "RET") "==")) ; move line up
+  (define-key evil-normal-state-map (kbd "C-k")   (concat ":m -2" (kbd "RET") "==")) ; move line down
 
   ;; (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   ;; (define-key evil-insert-state-map (kbd "s-v") (kbd "C-r +"))
@@ -97,6 +101,8 @@
   ;; (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
 
   ;; (define-key evil-visual-state-map  (kbd "s-c") (kbd "\"+y"))
+  (define-key evil-visual-state-map (kbd "C-j") (concat ":m '>+1" (kbd "RET") "gv=gv")) ; move line up
+  (define-key evil-visual-state-map (kbd "C-k")   (concat ":m '<-2" (kbd "RET") "gv=gv")) ; move line down
 
   ;; (define-key evil-ex-completion-map (kbd "s-v") (kbd "C-r +"))
   ;; (define-key evil-ex-search-keymap  (kbd "s-v") (kbd "C-r +"))
@@ -112,5 +118,3 @@
 ;;   ",c" 'evil-commentary)
 ;; (define-key evil-commentary-mode-map
 ;;   (kbd "M-;") 'evil-commentary-line)
-
-(provide 'hl-evil)

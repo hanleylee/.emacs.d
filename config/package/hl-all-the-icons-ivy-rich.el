@@ -1,3 +1,5 @@
+(provide 'hl-all-the-icons-ivy-rich)
+
 (use-package all-the-icons-ivy-rich
   :init
   (all-the-icons-ivy-rich-mode 1)
@@ -26,5 +28,3 @@
   ;; you can try setting the following variable
   (setq inhibit-compacting-font-caches t)
   )
-
-(provide 'hl-all-the-icons-ivy-rich)

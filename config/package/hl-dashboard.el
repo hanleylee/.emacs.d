@@ -1,3 +1,5 @@
+(provide 'hl-dashboard)
+
 (use-package dashboard
   :config
   (dashboard-setup-startup-hook)
@@ -58,5 +60,3 @@
   (setq dashboard-week-agenda t)
   (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   )
-
-(provide 'hl-dashboard)

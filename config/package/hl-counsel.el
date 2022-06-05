@@ -1,3 +1,5 @@
+(provide 'hl-counsel)
+
 (use-package counsel
   :init
   (setq counsel-yank-pop-preselect-last t)
@@ -7,5 +9,3 @@
          ("C-x C-h" . counsel-recentf)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history)))
-
-(provide 'hl-counsel)

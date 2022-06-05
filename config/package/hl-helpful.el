@@ -1,3 +1,4 @@
+(provide 'hl-helpful)
 
 (use-package helpful
   :custom
@@ -9,4 +10,3 @@
   ([remap describe-variabel] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
-(provide 'hl-helpful)

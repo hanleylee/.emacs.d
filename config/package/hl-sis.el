@@ -1,3 +1,5 @@
+(provide 'hl-sis)
+
 (use-package sis
   :after evil
   ;; :hook
@@ -21,5 +23,3 @@
   ;; enable the /inline english/ mode for all buffers
   ;; (sis-global-inline-mode t)
   )
-
-(provide 'hl-sis)

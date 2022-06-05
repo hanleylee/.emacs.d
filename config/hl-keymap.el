@@ -1,3 +1,5 @@
+(provide 'hl-keymap)
+
 ;; MARK: Global set key
 
 ;; switch themes
@@ -15,6 +17,3 @@
 (global-set-key (kbd "s--") 'text-scale-decrease)
 (global-set-key (kbd "s-s") 'save-buffer)
 (global-set-key (kbd "C-h l") 'find-library)
-
-
-(provide 'hl-keymap)

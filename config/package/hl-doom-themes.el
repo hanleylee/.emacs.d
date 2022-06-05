@@ -1,3 +1,5 @@
+(provide 'hl-doom-themes)
+
 ;; MARK: doom-theme
 (use-package doom-themes
   :config
@@ -18,5 +20,3 @@
   ;; (custom-set-variables `(doom-modeline-height 15))
   (advice-add #'fit-window-to-buffer :before (lambda (&rest _) (redisplay t)))
   )
-
-(provide 'hl-doom-themes)

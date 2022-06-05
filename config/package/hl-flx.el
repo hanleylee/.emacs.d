@@ -1,3 +1,3 @@
-(use-package flx)
-
 (provide 'hl-flx)
+
+(use-package flx)

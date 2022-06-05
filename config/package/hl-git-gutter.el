@@ -1,3 +1,5 @@
+(provide 'hl-git-gutter)
+
 (use-package git-gutter
   :hook (prog-mode . git-gutter-mode)
   :config
@@ -24,5 +26,3 @@
   ;; (set-face-foreground 'git-gutter:deleted "red")
   ;; (set-face-background 'git-gutter:unchanged "yellow")
   )
-
-(provide 'hl-git-gutter)

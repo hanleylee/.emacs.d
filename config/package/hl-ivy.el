@@ -1,3 +1,5 @@
+(provide 'hl-ivy)
+
 ;; MARK: ivy
 (use-package ivy
   :diminish
@@ -35,5 +37,3 @@
                                (t . 3))
         )
   )
-
-(provide 'hl-ivy)

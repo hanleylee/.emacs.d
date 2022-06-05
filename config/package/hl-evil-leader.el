@@ -1,3 +1,5 @@
+(provide 'hl-evil-leader)
+
 (use-package evil-leader
   :after evil
   :config
@@ -16,5 +18,3 @@
     )
   ;; (setq evil-leader/no-prefix-mode-rx '("magit-.*-mode" "gnus-.*-mode"))
   )
-
-(provide 'hl-evil-leader)

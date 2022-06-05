@@ -1,3 +1,4 @@
+(provide 'hl-general)
 
 (use-package general
   :config
@@ -23,5 +24,3 @@
   "[h" '(git-gutter:previous-hunk :which-key "git-gutter previous-hunk")
   "]h" '(git-gutter:next-hunk :which-key "git-gutter next-hunk")
   )
-
-(provide 'hl-general)

@@ -1,3 +1,5 @@
+(provide 'hl-evil-indent-plus)
+
 (use-package evil-indent-plus
   :after evil
   :config
@@ -8,5 +10,3 @@
   (define-key evil-inner-text-objects-map "J" 'evil-indent-plus-i-indent-up-down)
   (define-key evil-outer-text-objects-map "J" 'evil-indent-plus-a-indent-up-down)
   )
-
-(provide 'hl-evil-indent-plus)

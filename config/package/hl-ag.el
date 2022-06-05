@@ -1,4 +1,3 @@
+(provide 'hl-ag)
 
 (use-package ag)
-
-(provide 'hl-ag)

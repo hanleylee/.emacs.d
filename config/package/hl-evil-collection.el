@@ -1,3 +1,5 @@
+(provide 'hl-evil-collection)
+
 (use-package evil-collection
   :after evil
   :config
@@ -10,5 +12,3 @@
     " " 'dired-mark
     )
   )
-
-(provide 'hl-evil-collection)

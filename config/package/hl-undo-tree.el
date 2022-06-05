@@ -1,3 +1,5 @@
+(provide 'hl-undo-tree)
+
 (use-package undo-tree
   :init
   (setq undo-tree-enable-undo-in-region nil)
@@ -15,5 +17,3 @@
   (global-undo-tree-mode)
 
   )
-
-(provide 'hl-undo-tree)

@@ -1,3 +1,3 @@
-(use-package swift-mode)
-
 (provide 'hl-swift-mode)
+
+(use-package swift-mode)

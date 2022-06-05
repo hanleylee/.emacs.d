@@ -1,3 +1,5 @@
+(provide 'hl-option)
+
 ;; (check-parens)
 ;;(setq Doom-theme 'Doom-one)
 (load-theme 'doom-one t)
@@ -59,15 +61,13 @@
  kept-old-versions 2
  version-control t)       ; use versioned backups
 (setq hl-backup-dir (concat (getenv "XDG_CACHE_HOME") "/emacs/backup/"))
-(if (not (file-exists-p hl-backup-dir))
-    (make-directory hl-backup-dir))
+(hl-guard-dir-exists hl-backup-dir)
 (setq backup-directory-alist `(("." . ,hl-backup-dir)))
 ; (add-to-list 'backup-directory-alist '(("." . ,hl-backup-dir)))
 
 ;; MARK: Auto Lock
 (setq hl-lock-dir (concat (getenv "XDG_CACHE_HOME") "/emacs/lock/"))
-(if (not (file-exists-p hl-lock-dir))
-    (make-directory hl-lock-dir))
+(hl-guard-dir-exists hl-lock-dir)
 ; (add-to-list 'lock-file-name-transforms `((".*" "~/.cache/emacs/lock/" t)))
 (setq lock-file-name-transforms `((".*" ,hl-lock-dir t)))
 
@@ -132,4 +132,6 @@
 (setq recentf-max-menu-items 10000)
 (setq recentf-max-saved-items 10000)
 
-(provide 'hl-option)
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(hl-guard-file-exists custom-file)
+(load custom-file)
