@@ -27,33 +27,32 @@
 (use-package org
   ;; :hook (org-mode . efs/org-mode-setup)
   ;; :mode (("\\.org\\'" . org-mode))
-  :config
+  :init
+  (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
   (setq org-capture-templates
         `(("t" "task" entry (file ,hl-inbox-file) "* TODO %?\nCaptured %<%Y-%m-%d %H:%M>") 
           ("n" "note" entry (file ,hl-notes-file) "* Note %<%Y-%m-%d %H:%M>\n%?")))
 
   (setq org-M-RET-may-split-line nil)
-  (add-to-list 'auto-mode-alist  '("\\.org\\'" . org-mode))
-  (efs/org-font-setup)
-  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
-  (add-hook 'org-mode-hook (lambda ()
-                             (setq tab-width 2)
-                             (setq evil-shift-width 2)
-                             ))
-  (setq org-image-actual-width nil
-        org-display-remote-inline-images 'download
-        ;; org-display-remote-inline-images 'cache
+  (setq org-image-actual-width '(300)
+        org-display-remote-inline-images 'download ; 'cache 'skip
         org-startup-with-inline-images "inlineimages"
-        ;; org-startup-indented t
-        org-ellipsis " ···"
+        org-startup-indented nil
         truncate-lines nil
         org-hide-emphasis-markers t
         org-hide-leading-stars t
         org-fontify-done-headline t
         org-pretty-entities t
+        org-ellipsis " ···"
         org-odd-level-only t
         org-src-fontify-natively t
         org-src-tab-acts-natively t
+        org-auto-align-tags nil
+        org-tags-column 0
+        org-catch-invisible-edits 'show-and-error
+        org-special-ctrl-a/e t
+        org-insert-heading-respect-content t
+
         )
   (setq org-todo-keywords '(
                             (sequence "TODO(t!)" "DOING(i!)" "|" "DONE(d!)" "ABORT(a!)")
@@ -121,9 +120,15 @@
   (setq calendar-mark-holidays-flag t) ; 让 calendar 自动标记出节假日的日期(也可以用 x 切换状态)
   (setq calendar-mark-diary-entries-flag t) ; 让 calendar 自动标记出所有记有待办事项的日期(也可以用 m 切换状态)
   (setq org-use-fast-todo-selection t)
-  (setq org-agenda-files (list (concat hl-todo-dir "/agenda")))
-  (setq org-agenda-ndays 21)
-  (setq org-agenda-include-diary t)
+  ;; Agenda styling
+  (setq org-agenda-files (list (concat hl-todo-dir "/agenda"))
+        org-agenda-ndays 21
+        org-agenda-include-diary t
+        org-agenda-tags-column 0
+        org-agenda-block-separator ?─
+        org-agenda-time-grid '((daily today require-timed) (800 1000 1200 1400 1600 1800 2000) " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+        org-agenda-current-time-string "⭠ now ─────────────────────────────────────────────────"
+        )
   (setq org-list-demote-modify-bullet
       (quote (("+" . "-")
               ("-" . "+")
@@ -138,6 +143,15 @@
               ("B." . "-")
               ("a." . "-")
               ("b." . "-"))))
+  (setq org-confirm-babel-evaluate nil) ; 禁止 emacs 执行前询问
+
+  :config
+  (efs/org-font-setup)
+  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+  (add-hook 'org-mode-hook (lambda ()
+                             (setq tab-width 2)
+                             (setq evil-shift-width 2)
+                             ))
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -149,35 +163,4 @@
      (lua . t)
      (perl . t)
      (sqlite . t)))
-  (setq org-confirm-babel-evaluate nil) ; 禁止 emacs 执行前询问
-  (use-package cal-china-x
-    :config
-    (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
-    )
-
-  (use-package org-bullets
-    :after org
-    :hook (org-mode . org-bullets-mode)
-    :custom
-    (org-bullets-bullet-list '("●" "◉" "○" "▶" "◆" "◇" "★" "✿" "❀" "✸")))
-
-  (use-package org-appear
-    :init
-    (setq org-appear-autolinks t
-          org-appear-autosubmarkers t
-          org-appear-autoentities t
-          org-appear-autokeywords t
-          org-appear-inside-latex t
-          org-appear-delay 0
-          org-appear-trigger 'always)
-    :config
-    (add-hook 'org-mode-hook 'org-appear-mode)
-    )
-  (use-package toc-org
-    :config
-    (add-hook 'org-mode-hook 'toc-org-mode)
-    ;; enable in markdown, too
-    ;; (add-hook 'markdown-mode-hook 'toc-org-mode)
-    ;; (define-key markdown-mode-map (kbd "C\-c C-o") 'toc-org-markdown-follow-thing-at-point)
-    )
   )

@@ -28,6 +28,10 @@
 ;; MARK: Major mode
 (require 'hl-dashboard)
 (require 'hl-org)
+(require 'hl-org-appear)
+(require 'hl-org-bullets)
+(require 'hl-org-modern)
+(require 'hl-toc-org)
 (require 'hl-markdown-mode)
 (require 'hl-swift-mode)
 (require 'hl-magit)
@@ -46,6 +50,7 @@
 ;; Functional
 ;; (require 'hl-exec-path-from-shell)
 (require 'hl-undo-tree)
+(require 'hl-cal-china-x)
 (require 'hl-command-log-mode)
 (require 'hl-evil)
 (require 'hl-evil-leader)

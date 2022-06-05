@@ -6,16 +6,16 @@
 
 (setq frame-title-format "emacs")
 ;; 禁止菜单栏
-(menu-bar-mode 1)
+(menu-bar-mode -1)
 ;; 禁止工具栏
 (tool-bar-mode -1)
+;; 禁止滚动条
+(scroll-bar-mode -1)
 (tooltip-mode -1)
 ;; 记录上一次文件打开的位置, 并在再次打开该文件的时候自动跳转到该位置
 (save-place-mode 1)
 
 (setq delete-by-moving-to-trash t)
-;; 禁止滚动条
-(scroll-bar-mode -1)
 ;; 禁止 emacs 一个劲的叫
 (setq visible-bell t)
 ;; 在 console, 禁止屏幕不停地闪
