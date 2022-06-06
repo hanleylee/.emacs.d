@@ -8,15 +8,18 @@
     :global-prefix "S-SPC"))
 
 (rune/leader-keys
-  "t" '(:ignore t :which-key "Toggles")
   "tt" '(counsel-load-theme :which-key "Choose theme")
   "C-h" '(counsel-recentf :which-key "Recentf")
   "C-f" '(counsel-projectile-find-file :which-key "Project file")
   "C-b" '(counsel-switch-buffer :which-key "Buffer")
   "C-g" '(show-file-name :which-key "Show file name")
+  "C-q" '(kill-this-buffer :which-key "Kill buffer")
+
+  "M-q" '(save-buffers-kill-terminal :which-key "Kill buffers")
+
   "gs" '(magit-status :which-key "Magit Status")
-  "ct" '(org-capture :which-key "Org Capture")
-  "ad" '(org-agenda :which-key "Org Agenda")
+  "oc" '(org-capture :which-key "Org Capture")
+  "oa" '(org-agenda :which-key "Org Agenda")
 
   "<DEL>" '(evil-ex-nohighlight :which-key "Remove highlight")
 

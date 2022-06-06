@@ -56,7 +56,6 @@
                                                      :v-adjust -0.05
                                                      :face 'font-lock-keyword-face))
   (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
-  (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
   (setq dashboard-week-agenda t)
   (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   )

@@ -1,8 +1,6 @@
 (provide 'hl-option)
 
 ;; (check-parens)
-;;(setq Doom-theme 'Doom-one)
-(load-theme 'doom-one t)
 
 (setq frame-title-format "emacs")
 ;; 禁止菜单栏
@@ -131,6 +129,7 @@
 (setq indent-line-function 'insert-tab)
 
 (recentf-mode 1)
+(setq recentf-save-file (expand-file-name "recentf" "~/.emacs.d"))
 (setq recentf-max-menu-items 10000)
 (setq recentf-max-saved-items 10000)
 

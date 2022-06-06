@@ -16,7 +16,7 @@
         company-tooltip-align-annotations t  ; Align annotation to the right side.
         company-eclim-auto-save nil          ; Stop eclim auto save.
         company-dabbrev-downcase nil        ; No downcase when completion.
-        company-idle-delay 0                ; 开始自动补全前的延迟秒数。输入前缀长度必须要满足 company-minimum-prefix-length，该值为 nil 表示没有延迟。
+        company-idle-delay 0.3                ; 开始自动补全前的延迟秒数。输入前缀长度必须要满足 company-minimum-prefix-length，该值为 nil 表示没有延迟。
         company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil
         company-dabbrev-code-ignore-case t

@@ -30,7 +30,7 @@
 (require 'hl-org)
 (require 'hl-org-appear)
 (require 'hl-org-bullets)
-(require 'hl-org-modern)
+;; (require 'hl-org-modern)
 (require 'hl-toc-org)
 (require 'hl-markdown-mode)
 (require 'hl-swift-mode)
