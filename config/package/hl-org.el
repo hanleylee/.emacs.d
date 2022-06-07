@@ -121,7 +121,7 @@
   (setq calendar-mark-diary-entries-flag t) ; 让 calendar 自动标记出所有记有待办事项的日期(也可以用 m 切换状态)
   (setq org-use-fast-todo-selection t)
   ;; Agenda styling
-  (setq org-agenda-files (list (concat hl-todo-dir "/agenda"))
+  (setq org-agenda-files (list hl-agenda-dir)
         org-agenda-ndays 21
         org-agenda-include-diary t
         org-agenda-tags-column 0
