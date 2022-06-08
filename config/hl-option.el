@@ -61,7 +61,7 @@
  vc-make-backup-files t
  backup-by-copying t      ; don't clobber symlinks
  delete-old-versions t
- kept-new-versions 256
+ kept-new-versions 5
  kept-old-versions 2
  version-control t)       ; use versioned backups
 (setq backup-directory-alist `(("." . ,hl-backup-dir)))

@@ -10,3 +10,8 @@
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (add-to-list (make-local-variable 'company-backends)
                                                'company-elisp)))
+
+(add-hook 'json-mode-hook
+          (lambda ()
+            (make-local-variable 'js-indent-level)
+            (setq js-indent-level 4)))

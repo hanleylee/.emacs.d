@@ -34,6 +34,7 @@
 (require 'hl-toc-org)
 (require 'hl-markdown-mode)
 (require 'hl-swift-mode)
+(require 'hl-json-mode)
 (require 'hl-magit)
 
 ;; MARK: UI
