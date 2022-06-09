@@ -81,6 +81,7 @@
   (setq evil-want-C-w-delete t)
   (setq x-select-enable-clipboard nil)
   ;; :hook (evil-mode . evil-hook)
+  (setq isearch-lazy-count t)
   :config
   (evil-mode t)
 

@@ -11,3 +11,5 @@
 (require 'hl-package-entry)
 (require 'hl-keymap)
 (require 'hl-hook)
+
+(server-start)

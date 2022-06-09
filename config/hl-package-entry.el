@@ -62,6 +62,7 @@
 (require 'hl-evil-numbers)
 (require 'hl-evil-collection)
 (require 'hl-evil-org)
+(require 'hl-evil-anzu)
 (require 'hl-sis)
 (require 'hl-which-key)
 (require 'hl-helpful)
