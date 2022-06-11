@@ -3,6 +3,7 @@
 ;; (check-parens)
 
 (setq frame-title-format "emacs")
+(setq frame-inhibit-implied-resize t)
 ;; 禁止菜单栏
 (menu-bar-mode -1)
 ;; 禁止工具栏
@@ -25,8 +26,8 @@
 ;; 一行最多显示 150
 (setq-default fill-column 150)
 
-;; 默认 major-mode 为 text-mode
-(setq default-major-mode 'text-mode)
+;; 默认 major-mode 为 fundamental-mode
+(setq default-major-mode 'fundamental-mode)
 (column-number-mode)
 
 ;; (desktop-save-mode 1)
