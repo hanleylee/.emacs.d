@@ -33,10 +33,6 @@
 (setq desktop-path '(concat (getenv "XDG_CACHE_HOME") "/emacs/"))
 ;;(desktop-read)
 
-;; MARK: Keys binding
-(setq mac-command-modifier 'super)
-(setq mac-option-modifier 'meta)
-
 (show-paren-mode t)
 (setq show-paren-style 'parenthesses)
 ;;显示语法高亮
